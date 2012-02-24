@@ -38,3 +38,11 @@ Contributor: ohdae
 Added ability to search target system for all .SQL files and save their locations to a text file.
 Also searches for the location of all .ssh/ directories, their contents and all *history files (bash history, nano, sql, etc)
 Contributor: ohdae
+
+02-23-2012
+Fixed Temp_Directory issue. The temporary directory is now removed unless it is specifically used by Intersect v2 to
+hold reports and other data. Now you won't end up with a /tmp/ folder full of /lift-RANDOM's.
+Fixed Change Directory issue in the TCP bindshell. Previously when you tried to 'cd' to a non-existant directory,
+the shell would crash and cut the connection. Now we check if the directory exists, 'cd' to it if it does and if not,
+we present an error message to the user stating the desired directory can not be found.
+Contributor: ohdae & sk
