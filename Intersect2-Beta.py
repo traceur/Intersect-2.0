@@ -295,10 +295,14 @@ def NetworkMap():
     print("[+] Searching for live hosts...")
     os.mkdir(Temp_Dir+"/hosts")
     os.chdir(Temp_Dir+"/hosts")
+    localIP = [x[4] for x in scapy.all.conf.route.routes if x[2] != '0.0.0.0'][0]
+    splitIP = localIP.split('.')
+    splitIP[3:] = (['0/24'])
+    IPRange = '.'.join(splitIP)
     conf.verb=0
-    ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst="192.168.1.0/24"),timeout=2)
+    ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=IPRange),timeout=2)
     file = open("livehosts.txt", "a")
-    file.write("LAN IP Range: 192.168.1.0/24\n\n")
+    file.write("LAN IP Range: " + IPRange +"\n\n")
     for snd,rcv in ans:
         mac_address=rcv.sprintf("%Ether.src%")
         ip_address=rcv.sprintf("%ARP.psrc%")
