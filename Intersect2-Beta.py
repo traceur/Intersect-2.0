@@ -241,7 +241,7 @@ def GetCredentials():
         shutil.copy2("/etc/gshadow", Temp_Dir+"/credentials/")
 
     os.system("lastlog > lastlog.txt")
-    os.system("last > last.txt")
+    os.system("last -a > last.txt")
     os.system("getent aliases > mail_aliases.txt")
 
 def NetworkInfo():
