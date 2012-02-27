@@ -317,6 +317,11 @@ def NetworkMap():
     file.write("\n")
     file.close
 
+    externalIP = ip = urllib2.urlopen("http://whatismyip.org").read()
+    file = open("external.txt", "a")
+    file.write("External IP Address: " + externalIP +"\n\n")
+    file.close
+
 # --------------- ARP scan then SYN scan each live IP ---------------------------------
 #print("[-] Searching for live hosts...")
 #ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst="192.168.1.0/24"),timeout=2)
