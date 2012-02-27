@@ -297,7 +297,6 @@ def NetworkMap():
    # Combine ARP then portscan. Send IPs to list and iterate through for the scan
    # Add service identification via socket for all open ports
    # Add traceroute after finding live hosts. Send all results to graph report.
-   # import scapy.all
    
     print("[+] Searching for live hosts...")
     os.mkdir(Temp_Dir+"/hosts")
@@ -318,14 +317,10 @@ def NetworkMap():
     file.write("\n")
     file.close
 
-
     externalIP = ip = urllib2.urlopen("http://whatismyip.org").read()
     file = open("external.txt", "a")
     file.write("External IP Address: " + externalIP +"\n\n")
     file.close
-
-
-
 
 # --------------- ARP scan then SYN scan each live IP ---------------------------------
 #print("[-] Searching for live hosts...")
@@ -718,4 +713,5 @@ if __name__ == "__main__":
     if len(sys.argv) <=1:
         usage()
     main(sys.argv[1:])
+
 
