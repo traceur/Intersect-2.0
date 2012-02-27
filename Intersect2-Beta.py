@@ -186,14 +186,17 @@ def Gather_OS():
    os.system("find /home -type f -iname '.*history' > HistoryList.txt")
    os.system("cat /proc/cpuinfo > cpuinfo.txt")
    os.system("cat /proc/meminfo > meminfo.txt")
+   
    sysfiles = ["distro_kernel.txt","filesystem.txt","memory.txt","cpuinfo.txt","meminfo.txt"]
    content = ''
    for f in sysfiles:
        content = content + '\n' + open(f).read()
    open('SysInfo.txt','wb').write(content)
    os.system("rm distro_kernel.txt filesystem.txt memory.txt cpuinfo.txt meminfo.txt")
+   
    os.mkdir("users/")
    os.chdir("users/")
+   
    file = open("CurrentUser.txt" ,"a")
    file.write("\n\nHome Directory: "+ Home_Dir+"\n\n")
    file.close()
@@ -206,10 +209,12 @@ def GetCredentials():
     print("[+] Collecting user and system credentials....")
     os.mkdir(Temp_Dir+"/credentials")
     os.chdir(Temp_Dir+"/credentials/")
+    
     os.system('getent passwd > passwd.txt')
     os.system('getent shadow > shadow.txt')
     os.system("find / -maxdepth 3 -name .ssh > ssh_locations.txt")
     os.system("ls /home/*/.ssh/* > ssh_contents.txt")    
+    
     sshfiles = ["ssh_locations.txt","ssh_contents.txt"]
     content = ''
     for f in sshfiles:
@@ -236,12 +241,13 @@ def GetCredentials():
         shutil.copy2(Home_Dir+'/.ssh/authorized_keys', Temp_Dir+"/credentials/")  
     if os.path.isfile(Home_Dir+"/.ssh/known_hosts") is True:               
         shutil.copy2(Home_Dir+'/.ssh/known_hosts', Temp_Dir+"/credentials/")
-    shutil.copy2(Home_Dir+'/.bash_history', Temp_Dir+"/credentials/bash_history.txt")
+    if os.path.isfile(Home_Dir+"/.bash_history") is True:
+    	shutil.copy2(Home_Dir+'/.bash_history', Temp_Dir+"/credentials/bash_history.txt")
     if os.path.isfile("/etc/gshadow") is True:
         shutil.copy2("/etc/gshadow", Temp_Dir+"/credentials/")
 
     os.system("lastlog > lastlog.txt")
-    os.system("last > last.txt")
+    os.system("last -a > last.txt")
     os.system("getent aliases > mail_aliases.txt")
 
 def NetworkInfo():
