@@ -168,14 +168,14 @@ def Gather_OS():
    elif distro == "slackware":
       os.system("ls /var/log/packages > packages_list.txt")
    else:
-      print("[!] Package manager not supported. Listings of /usr/bin and /usr/sbin will still be provided.")
+      pass
    
    if distro == "arch":
       os.system("egrep '^DAEMONS' /etc/rc.conf > services_list.txt")
    elif distro == "slackware":
       os.system("ls -F /etc/rc.d | grep \'*$\' > services_list.txt")
    else:
-      print("[!] Unable to retrieve services: This Linux distro may not be fully supported by Intersect")
+      pass
 
    os.system("mount -l > mount.txt")
    os.system("cat /etc/sysctl.conf > sysctl.txt")
@@ -653,7 +653,7 @@ def daemon(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     try: 
         pid = os.fork() 
         if pid > 0:
-            print "Daemon PID %d" % pid 
+            print "[+] Daemon PID %d" % pid 
             sys.exit(0) 
     except OSError, e: 
         print("[!] Intersect will now run in the background. Check %s for your reports." % Temp_Dir)
