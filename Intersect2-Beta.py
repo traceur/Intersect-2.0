@@ -294,6 +294,9 @@ def NetworkInfo():
        shutil.copy2("/etc/hosts.allow", networkdir)
    if os.path.exists("/etc/inetd.conf") is True:
        shutil.copy2("/etc/inetd.conf", networkdir)
+   if os.path.exists("/etc/host.conf") is True:
+   	shutil.copy2("/etc/host.conf", networkdir)
+   
                
 def NetworkMap():
    # Combine ARP then portscan. Send IPs to list and iterate through for the scan
@@ -380,7 +383,8 @@ def FindProtect():
     whereis perl > perl.txt && whereis nc > nc.txt && whereis nc6 > nc6.txt && whereis webmin > webmin.txt &&
     whereis python > pyth.txt && whereis gcc > gcc.txt && whereis jailkit > jailkit.txt && whereis pwgen > pwg.txt &&
     whereis proxychains > pxc.txt && whereis bastille > bastille.txt && whereis wireshark > wshark.txt &&
-    whereis nmap > nmap.txt
+    whereis nmap > nmap.txt && whereis firefox > firefox.txt && whereis nagios > nagios.txt && whereis tor > tor.txt
+    whereis openvpn > ovpn.txt && whereis virtualbox > vbox.txt && whereis magictree > mtree.txt && whereis apparmor > apparmor.txt
     """)
     extralists = os.listdir('.')
     content = ''
