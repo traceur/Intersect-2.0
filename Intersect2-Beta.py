@@ -85,7 +85,8 @@ def environment():
    global LASTLOG_STRUCT_SIZE
    global UTMP_FILEPATH      
    global WTMP_FILEPATH       
-   global LASTLOG_FILEPATH   
+   global LASTLOG_FILEPATH
+   global Config_Dir
    
    fullkernel = os.uname()[2]
    splitkern = fullkernel.split("-")
@@ -108,6 +109,8 @@ def environment():
     
    Rand_Dir = ''.join(random.choice(string.letters) for i in xrange(12))
    Temp_Dir = "/tmp/lift-"+"%s" % Rand_Dir
+   Config_Dir = Temp_Dir+"/configs/"
+   
 
    signal.signal(signal.SIGINT, signalHandler)
     
@@ -143,7 +146,6 @@ def Shutdown():
 def Gather_OS():
    print("[+] Collecting operating system and user information....")
    os.mkdir(Temp_Dir+"/osinfo/")
-   os.mkdir(Temp_Dir+"/configs/")
    os.chdir(Temp_Dir+"/osinfo/")
    
    proc = Popen('ps aux',
@@ -373,10 +375,19 @@ def FindProtect():
     os.mkdir(Temp_Dir+"/protection")
     protectiondir = (Temp_Dir+"/protection")
     os.chdir(protectiondir)
-    if os.path.exists("/etc/snort/snort.conf") is True:
-        shutil.copy2("/etc/snort/snort.conf", Temp_Dir+"/configs/")
-    print("[+] Searching for protection and misc extras....")
+    os.mkdir(Config_Dir)
 
+    configs = [ "/etc/snort/snort.conf", "/etc/apache2/apache2.conf", "/etc/apache2/ports.conf",
+                "/etc/bitlbee/bitlbee.conf", "/etc/mysql/my.cnf", "/etc/ufw/ufw.conf", "/etc/ufw/sysctl.conf",
+                "/etc/security/access.conf", "/etc/security/sepermit.conf", "/etc/ca-certificates.conf", "/etc/apt/secring.gpg",
+                "/etc/apt/trusted.gpg", "/etc/nginx/nginx.conf", "/etc/shells", "/etc/gated.conf", "/etc/inetd.conf", "/etc/rpc",
+                "/etc/psad/psad.conf", "/etc/mysql/debian.cnf", "/etc/chkrootkit.conf", "/etc/logrotate.conf", "/etc/rkhunter.conf" ]
+
+    for x in configs:
+        if os.path.exists(x) is True:
+            shutil.copy2(x, Temp_Dir+"/configs/")
+
+    print("[+] Searching for protection and misc extras....")
     program = [ "truecrypt", "bulldog", "ufw", "iptables", "logrotate", "logwatch", 
                 "chkrootkit", "clamav", "snort", "tiger", "firestarter", "avast", "lynis",
                 "rkhunter", "perl", "tcpdump", "nc", "webmin", "python", "gcc", "jailkit", 
