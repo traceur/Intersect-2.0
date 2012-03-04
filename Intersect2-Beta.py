@@ -361,19 +361,6 @@ def NetworkMap():
 #  mac = mac[:17]
 #  print mac
     
-def FindProtect():
-    # check ToDo-List for additional changes
-    # The os.system command runs all at once and is not efficient at all
-    # This is just a temporary way of doing it while I finish rewriting this feature and
-    # add the rest of the applications that we try to find. 
-    
-    print("[+] Finding system protection applications....")
-    os.mkdir(Temp_Dir+"/protection")
-    protectiondir = (Temp_Dir+"/protection")
-    os.chdir(protectiondir)
-    if os.path.exists("/etc/snort/snort.conf") is True:
-        shutil.copy2("/etc/snort/snort.conf", Temp_Dir+"/configs/")
-    print("[+] Serching for misc extras (netcat, perl, gcc, tcpdump, etc)....")
  
 def whereis(program):
     for path in os.environ.get('PATH', '').split(':'):
@@ -382,7 +369,7 @@ def whereis(program):
                 return os.path.join(path, program)
     return None
     
-def GetProtection():
+def FindProtect():
     os.mkdir(Temp_Dir+"/protection")
     protectiondir = (Temp_Dir+"/protection")
     os.chdir(protectiondir)
