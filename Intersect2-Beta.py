@@ -374,25 +374,35 @@ def FindProtect():
     if os.path.exists("/etc/snort/snort.conf") is True:
         shutil.copy2("/etc/snort/snort.conf", Temp_Dir+"/configs/")
     print("[+] Serching for misc extras (netcat, perl, gcc, tcpdump, etc)....")
-    os.system("""
-    whereis truecrypt > tc.txt && whereis bulldog > bulldog.txt && whereis ufw > ufw.txt && 
-    whereis iptables > ipt.txt && whereis logrotate.txt > logr.txt && whereis logwatch > logw.txt && 
-    whereis chkrootkit > chkrt.txt && whereis clamav > clamav.txt && whereis snort > snort.txt &&
-    whereis firestarter > firestarter.txt && whereis avast > avast.txt && whereis tiger > tiger.txt &&
-    whereis lynis > lynis.txt && whereis rkhunter > rkhunt.txt && whereis tcpdump > tcpd.txt &&
-    whereis perl > perl.txt && whereis nc > nc.txt && whereis nc6 > nc6.txt && whereis webmin > webmin.txt &&
-    whereis python > pyth.txt && whereis gcc > gcc.txt && whereis jailkit > jailkit.txt && whereis pwgen > pwg.txt &&
-    whereis proxychains > pxc.txt && whereis bastille > bastille.txt && whereis wireshark > wshark.txt &&
-    whereis nmap > nmap.txt && whereis firefox > firefox.txt && whereis nagios > nagios.txt && whereis tor > tor.txt
-    whereis openvpn > ovpn.txt && whereis virtualbox > vbox.txt && whereis magictree > mtree.txt && whereis apparmor > apparmor.txt
-    """)
-    extralists = os.listdir('.')
-    content = ''
-    for f in extralists:
-        content = content + '\n' + open(f).read()
-    open('FullList','wb').write(content)
-    os.system("rm *.txt")
+ 
+def whereis(program):
+    for path in os.environ.get('PATH', '').split(':'):
+       if os.path.exists(os.path.join(path, program)) and \
+            not os.path.isdir(os.path.join(path, program)):
+                return os.path.join(path, program)
+    return None
+    
+def GetProtection():
+    os.mkdir(Temp_Dir+"/protection")
+    protectiondir = (Temp_Dir+"/protection")
+    os.chdir(protectiondir)
+    if os.path.exists("/etc/snort/snort.conf") is True:
+        shutil.copy2("/etc/snort/snort.conf", Temp_Dir+"/configs/")
+    print("[+] Searching for protection and misc extras....")
 
+    program = [ "truecrypt", "bulldog", "ufw", "iptables", "logrotate", "logwatch", 
+                "chkrootkit", "clamav", "snort", "tiger", "firestarter", "avast", "lynis",
+                "rkhunter", "perl", "tcpdump", "nc", "webmin", "python", "gcc", "jailkit", 
+                "pwgen", "proxychains", "bastille", "wireshark", "nagios", "nmap", "firefox",
+                "nagios", "tor", "openvpn", "virtualbox", "magictree", "apparmor" ]
+
+    for x in program:
+        location = whereis(x)
+        if location is not None:
+            file = open("FullList.txt","a")
+            content = location + '\n'
+            file.write(content)
+            file.close()
 
 def ScrubLog():  
   try:
