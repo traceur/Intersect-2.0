@@ -210,8 +210,12 @@ def Gather_OS():
    os.system("ls -alhR /home > AllUsers.txt")
    if os.path.exists(Home_Dir+"/.mozilla/") is True:
        os.system("find "+Home_Dir+"/.mozilla -name bookmarks*.json > UsersBookmarks.txt")
+<<<<<<< HEAD
    
 
+=======
+       
+>>>>>>> 72f8575b4ded02bfbd5703a9039ee275a4ecd700
    
 def GetCredentials():
     print("[+] Collecting user and system credentials....")
@@ -370,7 +374,11 @@ def FindProtect():
                 "/etc/apt/trusted.gpg", "/etc/nginx/nginx.conf", "/etc/shells", "/etc/gated.conf", "/etc/inetd.conf", "/etc/rpc",
                 "/etc/psad/psad.conf", "/etc/mysql/debian.cnf", "/etc/chkrootkit.conf", "/etc/logrotate.conf", "/etc/rkhunter.conf"
                 "/etc/samba/smb.conf", "/etc/ldap/ldap.conf", "/etc/openldap/ldap.conf", "/opt/lampp/etc/httpd.conf", "/etc/cups/cups.conf",
+<<<<<<< HEAD
                 "/etc/exports", "/etc/fstab", "~/.msf4/history", ]
+=======
+                "/etc/exports", "/etc/fstab", "~/.msf4/history" ]
+>>>>>>> 72f8575b4ded02bfbd5703a9039ee275a4ecd700
 
     for x in configs:
         if os.path.exists(x) is True:
