@@ -394,7 +394,16 @@ def FindExtras():
             file.close()
 
     if whereis('git') is not None:
-	os.system("find ~/ /home -name *.git > GitRepos.txt")        
+	os.system("find ~/ /home -name *.git > GitRepos.txt")
+        proc = Popen('cat /home/*/.gitconfig',
+               shell=True,
+               stdout=PIPE,
+               )
+        output = proc.communicate()[0]
+	file = open("GitRepos.txt","a")
+        file.write(output),
+        file.close()
+               
     if os.path.exists("~/.msf4/") is True:
         os.system("ls -l ~/.msf/loot > MetasploitLoot.txt")
 
