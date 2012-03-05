@@ -67,13 +67,13 @@ def usage():
    print("  -n --network        detailed network info")
    print("  -l --live-hosts     find live hosts on network")
    print("  -c --credentials    locate and save user/system credentials")
-   print("  -p --protection     locate commonly installed AV, FW's and extras")
+   print("  -e --extras         locate installed AV/FW, configs and extras")
    print("  -a --all-tests      run all local tests and tar reports *scapy required")
    print("  -t --tar            make archive of final reports")
    print("  -s --scrub          scrubs current user/ip from utmp, wtmp & lastlog")
    print("  -b --bind           opens bindshell on port 443")  
    print("  -h --help           prints this menu")
-   print("usage: ./intersect.py --daemon --network --protection")
+   print("usage: ./intersect.py --daemon --network --extras")
    print("       ./intersect.py --all-tests\n")
 
 def environment():
@@ -223,8 +223,8 @@ def GetCredentials():
     os.system("lastlog > lastlog.txt")
     os.system("last -a > last.txt")
     os.system("getent aliases > mail_aliases.txt")
-    
 
+    
     os.system("find / -maxdepth 3 -name .ssh > ssh_locations.txt")
     os.system("ls /home/*/.ssh/* > ssh_contents.txt")    
     sshfiles = ["ssh_locations.txt","ssh_contents.txt"]
@@ -358,8 +358,8 @@ def whereis(program):
     return None
     
 def FindProtect():
-    os.mkdir(Temp_Dir+"/protection")
-    protectiondir = (Temp_Dir+"/protection")
+    os.mkdir(Temp_Dir+"/extras")
+    protectiondir = (Temp_Dir+"/extras")
     os.chdir(protectiondir)
     os.mkdir(Config_Dir)
 
@@ -382,7 +382,8 @@ def FindProtect():
                 "chkrootkit", "clamav", "snort", "tiger", "firestarter", "avast", "lynis",
                 "rkhunter", "perl", "tcpdump", "nc", "webmin", "python", "gcc", "jailkit", 
                 "pwgen", "proxychains", "bastille", "wireshark", "nagios", "nmap", "firefox",
-                "nagios", "tor", "openvpn", "virtualbox", "magictree", "apparmor" ]
+                "nagios", "tor", "openvpn", "virtualbox", "magictree", "apparmor", "git",
+                "xen", "svn", "redmine", "ldap" ]
 
     for x in program:
         location = whereis(x)
@@ -392,6 +393,8 @@ def FindProtect():
             file.write(content)
             file.close()
 
+    if whereis('git') is not None:
+	os.system("find ~/ /home -name *.git > GitRepos.txt")        
     if os.path.exists("~/.msf4/") is True:
         os.system("ls -l ~/.msf/loot > MetasploitLoot.txt")
 
@@ -655,9 +658,9 @@ def MakeArchive():
         if os.path.exists("network/") is True:
            tar.add("network/")
            os.system("rm -rf network/")
-        if os.path.exists("protection/") is True:
-           tar.add("protection/")
-           os.system("rm -rf protection/")
+        if os.path.exists("extras/") is True:
+           tar.add("extras/")
+           os.system("rm -rf extras/")
         if os.path.exists("configs/") is True:
            tar.add("configs/")
            os.system("rm -rf configs/")
@@ -706,7 +709,7 @@ def daemon(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "dhtonlcpsba", ["daemon", "help", "tar", "os-info", "network", "live hosts", "credentials", "protection", "scrub", "bind", "all-tests"])
+        opts, args = getopt.getopt(argv, "dhtonlcesba", ["daemon", "help", "tar", "os-info", "network", "live hosts", "credentials", "extras", "scrub", "bind", "all-tests"])
     except getopt.GetoptError, err:
         print str(err) 
         usage()
@@ -728,7 +731,7 @@ def main(argv):
              NetworkMap()
         elif o in ("-c", "--credentials"):
              GetCredentials() 
-        elif o in ("-p", "--protection"): 
+        elif o in ("-e", "--extras"): 
              FindProtect()
         elif o in ("-s", "--scrub"):
 	     ScrubLog()
