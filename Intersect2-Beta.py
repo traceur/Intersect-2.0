@@ -357,7 +357,7 @@ def whereis(program):
                 return os.path.join(path, program)
     return None
     
-def FindProtect():
+def FindExtras():
     os.mkdir(Temp_Dir+"/extras")
     protectiondir = (Temp_Dir+"/extras")
     os.chdir(protectiondir)
@@ -612,7 +612,7 @@ def bindShell():
             	conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             	conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
             elif task.startswith("findextras"):
-            	FindProtect()
+            	FindExtras()
             	conn.send("\n[+] Extras Gather complete.")
             	conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             	conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
@@ -732,7 +732,7 @@ def main(argv):
         elif o in ("-c", "--credentials"):
              GetCredentials() 
         elif o in ("-e", "--extras"): 
-             FindProtect()
+             FindExtras()
         elif o in ("-s", "--scrub"):
 	     ScrubLog()
         elif o in ("-b", "--bind"):
@@ -742,7 +742,7 @@ def main(argv):
              NetworkInfo()
              NetworkMap()
              GetCredentials()
-             FindProtect()
+             FindExtras()
              MakeArchive()   
         else:
             assert False, "unhandled option"
