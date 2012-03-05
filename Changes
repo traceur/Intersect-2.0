@@ -52,5 +52,12 @@ Rewrote GetProtection() feature to optimize the searches. Added whereis() functi
 Added lots of files, configs and applications to our searches and file copies.
 Optimized some features to reduce the lines of code while speeding up the process.
 Added support to run Intersect tasks over the TCP shell.
-TCP shell now allows for multiple simultaneous remote connections. 
+TCP shell now allows for multiple simultaneous remote connections.
+Pulls Metasploit history file (if available), lists any stored Metasploit loot.
+Lists Firefox bookmarks and history.
+Contributor: ohdae
+
+03-05-2012
+Finished writing the majority of the Wiki for Intersect.
+All feature pages finished.
 Contributor: ohdae
