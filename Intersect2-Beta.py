@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # intersect 2.0 | created by ohdae
+# copyright 2011-2014
 # email: bindshell[at]live[dot]com
 # twitter: @ohdae
 # http://github.com/ohdae/Intersect-2.0/ || http://bindshell.it.cx/intersect.html
@@ -51,7 +52,7 @@ except ImportError:
 
 def usage():
     
-   __version__ = "version 2.0 - full edition"
+   __version__ = "revision 2.2.1"
    __author__ = "ohdae"
    __website__ = "http://bind.shell.la"
    
