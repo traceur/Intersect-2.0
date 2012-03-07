@@ -61,3 +61,13 @@ Contributor: ohdae
 Finished writing the majority of the Wiki for Intersect.
 All feature pages finished.
 Contributor: ohdae
+
+03-06-2012
+Locates any .Git repositories on the target system.
+Finds Git account details and saves to file.
+Added reverse TCP shell.
+List installed packages for many distributions (via their respective package manager utilities)
+Rewrote 'extask' command for reverse and bind shell.
+Added 'killme' command to reverse/bind shell that shuts down the shell connection.
+Contributor: ohdae
+

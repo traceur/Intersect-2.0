@@ -13,6 +13,8 @@ outside of this disclaimer. Long story short, do not use any part of the project
 Background
 ----------
 
+For an up-to-date feature list, check https://github.com/ohdae/Intersect-2.0/wiki/
+
 Intersect 2.0 is a Python script written to perform automated Post-Exploitation information gathering and reporting.
 The general idea is that after you have exploited a target, you run this script and it performs a variety of tasks
 that you would normally need to perform manually. Intersect will collect password files, copy SSH keys, enumerate 
