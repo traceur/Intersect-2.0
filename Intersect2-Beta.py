@@ -325,8 +325,11 @@ def NetworkInfo():
        content = content + '\n' + open(f).read()
    open('Connections.txt','wb').write(content)
    os.system("rm nstat.txt lsof.txt")
-   os.system("iptables -L -n > iptablesLN.txt") 
-   os.system("iptables-save > iptables_save.txt")
+   if whereis('iptables') is not None:
+       os.system("iptables -L -n > iptablesLN.txt") 
+       os.system("iptables-save > iptables_save.txt")
+   else:
+       pass
    os.system("ifconfig -a > ifconfig.txt")
    if distro == "ubuntu":
        os.system("hostname -I > localIP.txt")
