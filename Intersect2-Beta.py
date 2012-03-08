@@ -328,8 +328,13 @@ def NetworkInfo():
    os.system("iptables -L -n > iptablesLN.txt") 
    os.system("iptables-save > iptables_save.txt")
    os.system("ifconfig -a > ifconfig.txt")
+   if distro == "ubuntu":
+       os.system("hostname -I > localIP.txt")
+   else:
+       os.system("hostname -i > localIP.txt")
    os.system("hostname -f > hostname.txt")
-   netfiles = ["hostname.txt","ifconfig.txt"]
+   
+   netfiles = ["localIP.txt","hostname.txt","ifconfig.txt"]
    content = ''
    for f in netfiles:
        content = content + '\n' + open(f).read()
