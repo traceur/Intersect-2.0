@@ -328,8 +328,8 @@ def NetworkInfo():
    os.system("iptables -L -n > iptablesLN.txt") 
    os.system("iptables-save > iptables_save.txt")
    os.system("ifconfig -a > ifconfig.txt")
-   os.system("hostname -I > localIP.txt && hostname -f > hostname.txt")
-   netfiles = ["localIP.txt","hostname.txt","ifconfig.txt"]
+   os.system("hostname -f > hostname.txt")
+   netfiles = ["hostname.txt","ifconfig.txt"]
    content = ''
    for f in netfiles:
        content = content + '\n' + open(f).read()
@@ -440,7 +440,7 @@ def FindExtras():
                 "rkhunter", "perl", "tcpdump", "nc", "webmin", "python", "gcc", "jailkit", 
                 "pwgen", "proxychains", "bastille", "wireshark", "nagios", "nmap", "firefox",
                 "nagios", "tor", "openvpn", "virtualbox", "magictree", "apparmor", "git",
-                "xen", "svn", "redmine", "ldap" ]
+                "xen", "svn", "redmine", "ldap", "msfconsole" ]
 
     for x in program:
         location = whereis(x)
