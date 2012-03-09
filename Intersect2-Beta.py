@@ -380,10 +380,10 @@ def NetworkMap():
     file.write("\n")
     file.close
 
-    #externalIP = ip = urllib2.urlopen("http://whatismyip.org").read()
-    #file = open("external.txt", "a")
-    #file.write("External IP Address: " + externalIP +"\n\n")
-    #file.close
+    externalIP = ip = urllib2.urlopen("http://myip.ozymo.com/").read()
+    file = open("external.txt", "a")
+    file.write("External IP Address: " + externalIP +"\n\n")
+    file.close
 
 # --------------- ARP scan then SYN scan each live IP ---------------------------------
 #portscan  
