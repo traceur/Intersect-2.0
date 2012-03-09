@@ -49,10 +49,11 @@ logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 try:
     from scapy.all import *
 except ImportError:
-    from scapy import *
-except ImportError:
-    print("Python module Scapy not installed. You must have this to use the --live-hosts option.")
-    print("Scapy can be downloaded from: https://www.secdev.org/projects/scapy/\n")
+    try:
+        from scapy import *
+    except ImportError:
+        print("Python module Scapy not installed. You must have this to use the --live-hosts option.")
+        print("Scapy can be downloaded from: https://www.secdev.org/projects/scapy/\n")
 
 def usage():
     
@@ -253,7 +254,8 @@ def GetCredentials():
        content = content + '\n' + open(f).read()
     open('SSH_Locations.txt','wb').write(content)
     os.system("rm ssh_locations.txt ssh_contents.txt")
-    os.system("cat "+Home_Dir+"/.bash_history | grep ssh > SSH_History.txt")
+    if os.path.exists(Home_Dir+"/.bash_history") is True:
+        os.system("cat "+Home_Dir+"/.bash_history | grep ssh > SSH_History.txt")
 
 
     credentials = [ "/etc/master.passwd", "/etc/sudoers", "/etc/ssh/sshd_config", Home_Dir+"/.ssh/id_dsa", Home_Dir+"/.ssh/id_dsa.pub",
@@ -336,19 +338,35 @@ def NetworkInfo():
        os.system("iptables-save > iptables_save.txt")
    else:
        pass
+
    os.system("ifconfig -a > ifconfig.txt")
-   if distro == "ubuntu":
-       os.system("hostname -I > localIP.txt")
+
+
+   if distro == "ubuntu" or distro2 == "Ubuntu" is True:
+       os.system("hostname -I > IPAddresses.txt")
    else:
-       os.system("hostname -i > localIP.txt")
+       s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+       s.connect(("google.com",80))
+       localIP = (s.getsockname()[0])
+       s.close()
+       splitIP = localIP.split('.')
+       splitIP[3:] = (['0/24'])
+       IPRange = ".".join(splitIP)
+       externalIP = ip = urllib2.urlopen("http://myip.ozymo.com/").read()
+       file = open("IPAddresses.txt", "a")
+       file.write("External IP Address: " + externalIP)
+       file.write("Internal IP Address: " + localIP)
+       file.write("Internal IP Range: " + IPRange)
+       file.close
+   
    os.system("hostname -f > hostname.txt")
    
-   netfiles = ["localIP.txt","hostname.txt","ifconfig.txt"]
+   netfiles = ["IPAddresses.txt","hostname.txt","ifconfig.txt"]
    content = ''
    for f in netfiles:
        content = content + '\n' + open(f).read()
    open('NetworkInfo.txt','wb').write(content)
-   os.system("rm localIP.txt hostname.txt ifconfig.txt")
+   os.system("rm IPAddresses.txt hostname.txt ifconfig.txt")
 
    network = [ "/etc/hosts.deny", "/etc/hosts.allow", "/etc/inetd.conf", "/etc/host.conf", "/etc/resolv.conf" ]
    for x in network:
@@ -364,25 +382,37 @@ def NetworkMap():
     print("[+] Searching for live hosts...")
     os.mkdir(Temp_Dir+"/hosts")
     os.chdir(Temp_Dir+"/hosts")
-    localIP = [x[4] for x in scapy.all.conf.route.routes if x[2] != '0.0.0.0'][0]
+
+    try:
+        localIP = [x[4] for x in scapy.all.conf.route.routes if x[2] != '0.0.0.0'][0]
+    except OSError:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("google.com",80))
+        localIP = (s.getsockname()[0])
+        s.close()
+    else:
+        pass
     splitIP = localIP.split('.')
     splitIP[3:] = (['0/24'])
     IPRange = '.'.join(splitIP)
+    
     conf.verb=0
     ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=IPRange),timeout=2)
     file = open("livehosts.txt", "a")
-    file.write("LAN IP Range: " + IPRange +"\n\n")
+    file.write("LAN IP Range: " + IPRange +"\n")
     for snd,rcv in ans:
         mac_address=rcv.sprintf("%Ether.src%")
         ip_address=rcv.sprintf("%ARP.psrc%")
         #print rcv.sprintf("\n\n[+] Live Host\nMAC %Ether.src%\nIP: %ARP.psrc%\n ")
-        file.write("\n\n[+] Live Host\nIP: "+ip_address + " MAC"+ mac_address + "\n")
+        file.write("\n[+] Live Host\nIP: "+ip_address + " MAC"+ mac_address + "\n")
     file.write("\n")
     file.close
 
     externalIP = ip = urllib2.urlopen("http://myip.ozymo.com/").read()
     file = open("external.txt", "a")
-    file.write("External IP Address: " + externalIP +"\n\n")
+    file.write("External IP Address: " + externalIP +"\n")
+    file.write("Internal IP Address: " + localIP +"\n")
+    file.write("Internal IP Range: " + IPRange +"\n")
     file.close
 
 # --------------- ARP scan then SYN scan each live IP ---------------------------------
