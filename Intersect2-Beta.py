@@ -29,6 +29,7 @@
 
 import sys, os, re, signal
 from subprocess import Popen,PIPE,STDOUT,call
+import platform
 import shutil
 import getopt
 import tarfile
@@ -48,7 +49,10 @@ logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 try:
     from scapy.all import *
 except ImportError:
-    print "Python module Scapy not installed. You must have this to use the --live-hosts option."
+    from scapy import *
+except ImportError:
+    print("Python module Scapy not installed. You must have this to use the --live-hosts option.")
+    print("Scapy can be downloaded from: https://www.secdev.org/projects/scapy/\n")
 
 def usage():
     
@@ -91,6 +95,7 @@ def environment():
    global Config_Dir
    global RHOST
    global RPORT
+   global distro2
 
    # Change RHOST & RPORT accordingly if you're going to use the reverse shell   
    RHOST = '192.168.1.19'
@@ -100,6 +105,7 @@ def environment():
    splitkern = fullkernel.split("-")
    kernel = splitkern[0]
    distro = os.uname()[1]
+   distro2 = platform.linux_distribution()[0]
    arch = os.uname()[4]
  
    if os.geteuid() != 0:
@@ -171,17 +177,17 @@ def Gather_OS():
    os.system("ls -al /etc/cron* > cronjobs.txt")
    os.system("ls -alhtr /media > media.txt")
 
-   if distro == "ubuntu":
+   if distro == "ubuntu" or distro2 == "Ubuntu":
       os.system("dpkg -l > dpkg_list.txt")
-   elif distro == "arch":
+   elif distro == "arch" or distro2 == "Arch":
       os.system("pacman -Q > pacman_list.txt")
-   elif distro == "slackware":
+   elif distro == "slackware" or distro2 == "Slackware":
       os.system("ls /var/log/packages > packages_list.txt")
-   elif distro == "gentoo":
+   elif distro == "gentoo" or distro2 == "Gentoo":
       os.system("cat /var/lib/portage/world > packages.txt")
-   elif distro == "centos":
+   elif distro == "centos" or distro2 == "CentOS":
       os.system("yum list installed > yum_list.txt")
-   elif distro == "red hat":
+   elif distro == "red hat" or distro2 == "Red Hat":
       os.system("rpm -qa > rpm_list.txt")
    else:
       pass
@@ -374,10 +380,10 @@ def NetworkMap():
     file.write("\n")
     file.close
 
-    externalIP = ip = urllib2.urlopen("http://whatismyip.org").read()
-    file = open("external.txt", "a")
-    file.write("External IP Address: " + externalIP +"\n\n")
-    file.close
+    #externalIP = ip = urllib2.urlopen("http://whatismyip.org").read()
+    #file = open("external.txt", "a")
+    #file.write("External IP Address: " + externalIP +"\n\n")
+    #file.close
 
 # --------------- ARP scan then SYN scan each live IP ---------------------------------
 #portscan  
@@ -469,8 +475,8 @@ def FindExtras():
         file.write(output),
         file.close()
 
-    if whereis('svn') is not None:
-        os.system("find / -name *.svn > SvnRepos.txt")
+    #if whereis('svn') is not None:
+        #os.system("find / -name *.svn > SvnRepos.txt")
                
     if os.path.exists("~/.msf4/") is True:
         os.system("ls -l ~/.msf/loot > MetasploitLoot.txt")
