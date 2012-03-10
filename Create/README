@@ -1,0 +1,52 @@
+Intersect 2.0 | Custom Payload Generator
+author: ohdae | bindshell.it.cx
+----------------------------------------
+
+Overview
+Contents
+Writing Modules
+
+
+
+.:: Overview ::..
+   This utility can be used to generate customized Intersect scripts, using a base template and including any available modules that you choose.
+Every feature that is offered in the standard Intersect version is available as a module, such as OS-Info, Network, Live-Hosts, etc.
+When you run Create.py, you will be presented with a menu explaining the creation process and showing you all of the standard included modules.
+You will also have the option to add your own custom modules or 3rd party modules. Any extra module must follow a specific format in order to be
+compatible with Intersect 2.0 and the Payload Generator. Within the Modules folder, there is a blank template file included that you can use to
+start writing your own modules. 
+    At the time of writing this, the Payload Generator and the modules are still in the early development phase and this is more of a trial period
+than anything else. If you find any errors (crashes, certain modules fail, etc) either start an issue on the Github page or send me an email. When
+writing any error report, make sure you include the original crash report and a list of which modules you were using at the time. This will help the
+bug fix process greatly. 
+
+.:: Contents ::.
+
+* Create.py - This is the main script for the Payload Generator. When you run this file, you'll be presented with the menu showing you the available
+standard modules and how to import any extra modules. The instructions to use this script are very straight-forward and all detailed upon execution.
+
+* Template.py - Do *not* edit this file. This file is critical to the Payload Generator. It includes all needed library imports, any cross-module functions,
+and other important bits of code. This template is used as the base script upon which the customized scripts are created from. When you run Create.py, this 
+file is copied under the name 'Intersect-Custom.py' which will be your final product.
+
+* Modules Directory - Where the goods are at. The Modules directory holds all of the plugin modules and is where you need to put any custom modules that you
+might build. If you wish to write your own module, start by reading the contents of this directory. The file 'template.fnc', within this directory, is a sample
+module that you can copy and modify to create your own plugin modules. Do not change the names of any of the standard modules. Create.py relies on the standard
+module names to generate your custom script and changing the file names will break this functionality entirely.
+
+* Modules Contents - Any file with the extension '.fnc' is a plugin module. The standard modules are as follows: OSInfo.fnc, Network.fnc, LAN.fnc, Bind.fnc, Reverse.fnc,
+Credentials,fnc, Tar.fnc, Scrub.fnc, Daemon.fnc, Extras.fnc. Any custom module should use the file extension '.fnc'. This is not absolutely nessicary but just made it
+easier for me to understand during the development process. 
+
+* Intersect-Custom.py - Your custom payload. This file is only generated after you execute Create.py and successfully generate a custom Intersect payload. Once this file is
+generated, you can move it, rename it, whatever. It is advised that you move this file once it's generated since Create.py will not let you generate a new payload if a current
+Intersect-Custom.py file exists inside the same directory.
+
+
+.:: Writing Your Own Modules ::.
+
+I'll write this some day soon. I haven't even actually released any of this code yet and this README is more of a place-holder than anything else.
+If you are really interested in writing modules all ready, hit me up on IRC or Twitter. 
+
+
+-- ohdae.
