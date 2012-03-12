@@ -48,7 +48,7 @@ while True:
     elif msg.startswith('download'):
         getname = msg.split(" ")
         rem_file = getname[1]
-        filename = rem_file.replace("/","-")
+        filename = rem_file.replace("/","_")
         data = conn.recv(socksize)
         filedata = xor(data, pin)
         newfile = file(filename, "wb")

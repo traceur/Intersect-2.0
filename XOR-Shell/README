@@ -24,7 +24,7 @@ Features:
   -- example: extask credentials : Gathers passwords (--credentials), cd's to /tmp/lift-*/credentials/
 * Reboot remote system via 'rebootsys' command
 * Enabled SSH access (coming soon)
-* Download/Upload files (coming soon)
+* Download/Upload files
 * Help menus for general shell usage and extask help menu
 * Live packet sniffing (coming soon)
 
@@ -55,8 +55,8 @@ extask scrub       | clears 'who' 'w' 'last' 'lastlog'
 Intersect: /root/.ssh $ helpme
  Intersect TCP Shell | Help Menu 
 ---------------------------------
-** download <file> | download file from host
-** upload <file>   | upload file to host
+   download <file> | download file from host
+   upload <file>   | upload file to host
 ** isniff <iface>  | start sniffer on <iface>
 ** usessh <port>   | enable SSH on <port>
    extask  <task>  | run Intersect tasks
@@ -64,8 +64,5 @@ Intersect: /root/.ssh $ helpme
    rebootsys       | reboots server system
    helpme          | show this help menu
    killme          | shuts down connection
-** = must connect using the Intersect shell client to use this feature.
-
-Intersect: /root/.ssh $ 
 
 
