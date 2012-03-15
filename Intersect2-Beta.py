@@ -35,7 +35,6 @@ import getopt
 import tarfile
 import socket
 import urllib2
-import string
 import random, string
 import logging
 import struct
