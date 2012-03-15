@@ -52,7 +52,7 @@ except ImportError:
     try:
         from scapy import *
     except ImportError:
-        print("Python module Scapy not installed. You must have this to use the --live-hosts option.")
+        print("The Python module Scapy is not installed. You must have this to use the --live-hosts option.")
         print("Scapy can be downloaded from: https://www.secdev.org/projects/scapy/\n")
 
 def usage():
