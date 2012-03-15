@@ -7,7 +7,8 @@ Intersect 2.0 To-Do List
 * Add search for hidden files within tarballs
 * Add search for saved Nessus scans on target system
 * Add process that dumps the plain-text from memory and sends to .txt file
-* Optionally send NetworkMap() output to be imported within Metasploit DB
+* Optional sending of NetworkMap() output to be imported within Metasploit DB
+* Allow automated setup of tunneling/port-forwarding to assist with pivoting
 * Add plugin module support and provide templates for different distros and task outlines
   -- metasploit console module
   -- shadow cracking
