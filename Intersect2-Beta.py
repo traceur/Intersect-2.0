@@ -477,7 +477,7 @@ def FindExtras():
                 "/etc/apt/trusted.gpg", "/etc/nginx/nginx.conf", "/etc/shells", "/etc/gated.conf", "/etc/inetd.conf", "/etc/rpc",
                 "/etc/psad/psad.conf", "/etc/mysql/debian.cnf", "/etc/chkrootkit.conf", "/etc/logrotate.conf", "/etc/rkhunter.conf"
                 "/etc/samba/smb.conf", "/etc/ldap/ldap.conf", "/etc/openldap/ldap.conf", "/opt/lampp/etc/httpd.conf", "/etc/cups/cups.conf",
-                "/etc/exports", "/etc/fstab", "~/.msf4/history" ]
+                "/etc/exports", "/etc/fstab", "~/.msf4/history", "/etc/ssl/openssl.cnf" ]
 
 
     for x in configs:
