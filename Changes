@@ -92,3 +92,9 @@ Added README for Payload Generation utility
 Added capability to download & upload files over the XOR shells
 Minor bug fix for XOR shell download/upload
 
+03-18-2012
+Fixed privilege escalation checking range bug
+Added basic HTTP proxy feature
+  - users can now setup an HTTP proxy by running the cmd 'httproxy' over the remote shells
+
+
