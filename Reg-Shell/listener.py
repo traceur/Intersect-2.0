@@ -65,11 +65,13 @@ while True:
         print(" download <file>  | download file from host")
         print(" upload <file>    | upload file to host")
         print(" extask <task>    | run Intersect tasks")
+	print(" httproxy         | HTTP proxy on 8080")
         print(" adduser <name>   | add new root account")
         print(" rebootsys        | reboot remote host system")
         print(" helpme           | display this menu")
         print(" killme           | shuts down shell connection\n")
         print("* If the shell appears to hang after sending or receiving data, press [enter] and it should fix the issue.")
+
 
 
 conn.close()
