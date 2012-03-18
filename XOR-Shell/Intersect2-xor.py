@@ -104,19 +104,13 @@ def environment():
    RPORT = 443
    pin = 'XKIUKX'
 
-   fullkernel = os.uname()[2]
-   splitkern = fullkernel.split("-")
-   kernel = splitkern[0]
    distro = os.uname()[1]
    distro2 = platform.linux_distribution()[0]
-   arch = os.uname()[4]
  
    if os.geteuid() != 0:
-        print("[*] This script *must* be executed as root. If not, there will be errors and/or crashes.")
-        print("[*] Intersect will now check this kernel for possible privilege escalation exploits.\n     We will find your kernel version and display a list of exploits for that kernel, if available.")
+       print("[*] This script *must* be executed as root. If not, there will be errors and/or crashes.")
+        print("[*] Intersect will now check this kernel for possible privilege escalation exploits.\n")
         exploitCheck()
-        print("[+] The exploits above *might* allow you to gain root access.")
-        print("[+] Intersect cannot be executed as a non-root user. Please run again while root.")
         sys.exit()
    else:
         pass
@@ -577,14 +571,29 @@ def writeNewFile(filePath, fileContents):
   f.close()
   
 
+def fix_version(version):
+    split_version = version.split(".")
+
+    if len(split_version) >= 3 and len(split_version[2]) == 1:
+        split_version[2] = "0%s" % split_version[2]
+        version = ".".join(v for v in split_version)
+
+    return version
+
+
 def exploitCheck():
     # Shout out to Bernardo Damele for letting me use this code! Thanks again!
     # Check out his blog at http://bernardodamele.blogspot.com
 
+    kernel_version_string = os.popen('uname -r').read().strip()
+
     exploitdb_url = "http://www.exploit-db.com/exploits"
     enlightenment_url = "http://www.grsecurity.net/~spender/enlightenment.tgz"
     
-    print "[+] Results for local kernel version %s" % kernel
+    print "[+] Results for local kernel version %s" % kernel_version_string
+
+    kernel_parts = kernel_version_string.split("-")
+    kernel_version = fix_version(kernel_parts[0])
 
     found_exploit = False
     exploits = {
@@ -635,13 +644,19 @@ def exploitCheck():
             else:
                 min_version, max_version = version_tree, version_tree
 
-            if kernel >= min_version and kernel <= max_version:
+            if kernel_version >= fix_version(min_version) and kernel_version <= fix_version(max_version):
                 cve = data["CVE"]
                 exploits = data["exploits"]
                 found_exploit = True
 
                 print "\n* Linux Kernel %s Local Root Exploit\n    CVE: CVE-%s\n    Affected Kernels: %s-%s\n    Exploits:\n%s" % (name, cve, min_version, max_version, "\n".join("      %s/%d" % (exploitdb_url, expl) if isinstance(expl, int) else "      %s" % expl for expl in exploits))
 
+    if found_exploit:
+        print
+
+        if len(kernel_parts) > 1:
+            print "WARNING: %s appears to be a modified version of kernel %s." % (kernel_version_string, kernel_version)
+            print "These exploits can *possibly* get you to uid=0, but this script does *not* consider patched or backported kernel version\n"
 
 
 def bindShell():
