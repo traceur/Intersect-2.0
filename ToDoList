@@ -17,7 +17,12 @@ Intersect 2.0 To-Do List
 * Save browser history
 * Custom payload generation tool. Users select which features they want to include (and/or custom plugin modules)
   and a customized version of Intersect will be generated from a base-template.
-
+* Add persistent backdoor option to custom shells
+* Capture screenshot
+* Find office documents (pdf, docx, doc, xls, csv, ...)
+* Add remove stored reports option to custom shells
+* Add option to "hijack"/view active screen sessions over custom shells
+* Add SSL support to current HTTP proxy
 
 
 If you have any ideas for this project or would like to help out, feel free to contact me
