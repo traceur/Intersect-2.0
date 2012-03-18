@@ -419,40 +419,6 @@ def NetworkMap():
     file.write("Internal IP Address: " + localIP +"\n")
     file.write("Internal IP Range: " + IPRange +"\n")
     file.close
-
-# --------------- ARP scan then SYN scan each live IP ---------------------------------
-#portscan  
-#tcp = TCP(dport=[21,22,23,80,1433],sport=[53],flags="S",seq=40)
-#ans,unans = sr(ip/tcp)
-    
-#for sent,rcvd in ans:
-   #if not rcvd or rcvd.getlayer(TCP).flags != 0x12:
-      #print str(sent.dport)+" : closed"
-   #else:
-      #services = socket.getservbyport(sent.dport)
-      #print str(sent.dport)+" "+services+" : open"
-      
-#-----------------------------------Traceroute ---------------------------------------------    
-#res,unans = traceroute(["target"],dport=[{"open ports from scan or port 80"}],maxttl=20,retry=-2
-#
-#
-#------------------------------Get MAC addr-------------------------------------------------
-## Don't need this snippet yet but it's here so I don't lose it
-#
-# data = commands.getoutput("ifconfig " + iface)
-#  words = data.split()
-#  found = 0
-#  for x in words:
-      #print x
-#      if found != 0:
-#         mac = x
-#          break
-#      if x == "HWaddr":
-#          found = 1
-#  if len(mac) == 0:
-#      mac = 'Mac not found'
-#  mac = mac[:17]
-#  print mac
     
  
 def whereis(program):
