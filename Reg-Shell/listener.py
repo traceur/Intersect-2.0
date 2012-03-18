@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 # Intersect 2.0
-# XOR Shell Listener
-# trial version. don't expect this to work all that well.
+# TCP Shell Listener
+# https://github.com/ohdae/Intersect-2.0
 
 import os, sys
 import socket
@@ -60,7 +60,7 @@ while True:
         print("extask network     | ips, fw rules, connections, etc")
         print("extask scrub       | clears 'who' 'w' 'last' 'lastlog'")
     elif cmd == ("helpme"):
-        print(" Intersect XOR Shell | Help Menu")
+        print(" Intersect Shell | Help Menu")
         print("---------------------------------")
         print(" download <file>  | download file from host")
         print(" upload <file>    | upload file to host")
