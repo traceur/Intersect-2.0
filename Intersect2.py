@@ -42,6 +42,7 @@ import getpass
 import pwd
 import operator
 import SocketServer, SimpleHTTPServer
+from math import log
 
 cut = lambda s: str(s).split("\0",1)[0]
 
@@ -381,6 +382,7 @@ def NetworkMap():
     os.chdir(Temp_Dir+"/hosts")
 
     try:
+        #TODO:Consider scanning all non-loopback addresses for multi-homed machines
         localIP = [x[4] for x in scapy.all.conf.route.routes if x[2] != '0.0.0.0'][0]
     except OSError:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -389,9 +391,15 @@ def NetworkMap():
         s.close()
     else:
         pass
-    splitIP = localIP.split('.')
-    splitIP[3:] = (['0/24'])
-    IPRange = '.'.join(splitIP)
+    #Get the integer representation of the local IP address
+    ipBin = reduce(lambda x, y: (int(x) << 8)+int(y), localIP.split('.'))
+    #route = [ network_addr, netmask, gateway, interface, address ]
+    for route in scapy.all.conf.route.routes:
+        if (route[4] == localIP #If it's the address we're talking to
+            and route[0] != 0 #and it's not the route to the gateway itself
+            and route[0] == (route[1] & ipBin)): #And localIP is in this subnet (fixes 169.254/16 oddness)
+                #Calculate the CIDR from the base-2 logarithm of the netmask
+                IPRange = '/'.join((localIP, str(int(32-log(0xffffffff-route[1]+1,2)))))
     
     conf.verb=0
     ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=IPRange),timeout=2)
