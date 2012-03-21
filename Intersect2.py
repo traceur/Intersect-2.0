@@ -395,9 +395,9 @@ def NetworkMap():
     ipBin = reduce(lambda x, y: (int(x) << 8)+int(y), localIP.split('.'))
     #route = [ network_addr, netmask, gateway, interface, address ]
     for route in scapy.all.conf.route.routes:
-        if route[4] == localIP #If it's the address we're talking to
+        if (route[4] == localIP #If it's the address we're talking to
             and route[0] != 0 #and it's not the route to the gateway itself
-            and route[0] == (route[1] & ipBin): #And localIP is in this subnet (fixes 169.254/16 oddness)
+            and route[0] == (route[1] & ipBin)): #And localIP is in this subnet (fixes 169.254/16 oddness)
                 #Calculate the CIDR from the base-2 logarithm of the netmask
                 IPRange = '/'.join((localIP, str(int(32-log(0xffffffff-route[1]+1,2)))))
     
